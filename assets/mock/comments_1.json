@@ -1,0 +1,35 @@
+[
+  {
+    "id": "comment1",
+    "postId": "1",
+    "author": {
+      "id": "user4",
+      "nickname": "代码小白",
+      "avatarUrl": "https://randomuser.me/api/portraits/women/4.jpg"
+    },
+    "content": "讲得太好了！终于理解了 Flutter 的布局原理！",
+    "createdAt": "2024-11-10T10:05:00Z"
+  },
+  {
+    "id": "comment2",
+    "postId": "1",
+    "author": {
+      "id": "user5",
+      "nickname": "资深架构师",
+      "avatarUrl": "https://randomuser.me/api/portraits/men/5.jpg"
+    },
+    "content": "不错的入门视频，建议可以深入讲讲 Riverpod 的状态管理。",
+    "createdAt": "2024-11-10T11:30:00Z"
+  },
+  {
+    "id": "comment3",
+    "postId": "1",
+    "author": {
+      "id": "user2",
+      "nickname": "旅行的小猪",
+      "avatarUrl": "https://randomuser.me/api/portraits/women/2.jpg"
+    },
+    "content": "虽然看不懂代码，但感觉很厉害的样子！",
+    "createdAt": "2024-11-11T09:00:00Z"
+  }
+]
