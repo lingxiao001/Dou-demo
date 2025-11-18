@@ -28,7 +28,6 @@ class VideoRepository {
           nickname: authorJson['nickname'],
           avatarUrl: authorJson['avatarUrl'],
         ),
-        musicTitle: jsonItem['musicTitle'],
         musicCoverUrl: jsonItem['musicCoverUrl'],
         isLiked: jsonItem['isLiked'],
         createdAt: DateTime.parse(jsonItem['createdAt']),

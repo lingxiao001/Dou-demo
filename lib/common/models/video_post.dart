@@ -8,7 +8,6 @@ class VideoPost {
   final int likeCount;
   final int commentCount;
   final User author;
-  final String musicTitle;
   final String musicCoverUrl;
   final bool isLiked;
   final DateTime createdAt;
@@ -21,7 +20,6 @@ class VideoPost {
     required this.likeCount,
     required this.commentCount,
     required this.author,
-    required this.musicTitle,
     required this.musicCoverUrl,
     required this.isLiked,
     required this.createdAt,
