@@ -1,5 +1,7 @@
+import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douyin_demo/common/models/video_post.dart';
+import 'package:douyin_demo/common/services/thumbnail_service.dart';
 import 'package:flutter/material.dart';
 
 class VideoCard extends StatelessWidget {
@@ -19,21 +21,35 @@ class VideoCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: CachedNetworkImage(
+        FutureBuilder<Uint8List?>(
+          future: ThumbnailService.fromAsset(videoPost.videoUrl),
+          builder: (context, snapshot) {
+            Widget child;
+            if (snapshot.connectionState != ConnectionState.done) {
+              child = AspectRatio(
+                aspectRatio: 3 / 4,
+                child: Container(color: Colors.grey.shade200),
+              );
+            } else if (snapshot.hasData && snapshot.data != null) {
+              child = Image.memory(
+                snapshot.data!,
+                fit: BoxFit.cover,
+              );
+            } else {
+              child = CachedNetworkImage(
                 imageUrl: videoPost.coverUrl,
                 placeholder: (context, url) => AspectRatio(
-                  aspectRatio: 3 / 4, // A more common aspect ratio for cards
+                  aspectRatio: 3 / 4,
                   child: Container(color: Colors.grey.shade200),
                 ),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
-            ),
-            // You can add duration here if you have it in the model
-          ],
+              );
+            }
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: child,
+            );
+          },
         ),
         const SizedBox(height: 8),
         Text(
