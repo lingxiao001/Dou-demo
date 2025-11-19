@@ -1,7 +1,6 @@
-import 'dart:typed_data';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 import 'package:douyin_demo/common/models/video_post.dart';
-import 'package:douyin_demo/common/services/thumbnail_service.dart';
+import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
 import 'package:flutter/material.dart';
 
 class VideoCard extends StatelessWidget {
@@ -21,35 +20,35 @@ class VideoCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FutureBuilder<Uint8List?>(
-          future: ThumbnailService.fromAsset(videoPost.videoUrl),
-          builder: (context, snapshot) {
-            Widget child;
-            if (snapshot.connectionState != ConnectionState.done) {
-              child = AspectRatio(
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: FutureBuilder<File>(
+            future: ThumbnailCacheService().getThumbnail(videoPost.videoUrl),
+            builder: (context, snapshot) {
+              Widget image;
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
+                image = Image.file(
+                  snapshot.data!,
+                  fit: BoxFit.cover,
+                );
+              } else if (snapshot.hasError) {
+                print("Thumbnail generation error: ${snapshot.error}");
+                image = Container(
+                  color: Colors.grey.shade200,
+                  child: const Icon(Icons.error_outline),
+                );
+              } else {
+                image = Container(
+                  color: Colors.grey.shade200,
+                );
+              }
+              return AspectRatio(
                 aspectRatio: 3 / 4,
-                child: Container(color: Colors.grey.shade200),
+                child: image,
               );
-            } else if (snapshot.hasData && snapshot.data != null) {
-              child = Image.memory(
-                snapshot.data!,
-                fit: BoxFit.cover,
-              );
-            } else {
-              child = CachedNetworkImage(
-                imageUrl: videoPost.coverUrl,
-                placeholder: (context, url) => AspectRatio(
-                  aspectRatio: 3 / 4,
-                  child: Container(color: Colors.grey.shade200),
-                ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              );
-            }
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: child,
-            );
-          },
+            },
+          ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -68,7 +67,17 @@ class VideoCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 11,
-              backgroundImage: NetworkImage(videoPost.author.avatarUrl),
+              child: ClipOval(
+                child: Image.network(
+                  videoPost.author.avatarUrl,
+                  fit: BoxFit.cover,
+                  width: 22,
+                  height: 22,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.person, size: 14);
+                  },
+                ),
+              ),
             ),
             const SizedBox(width: 6),
             Expanded(
