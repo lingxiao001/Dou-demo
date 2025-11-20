@@ -134,22 +134,29 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
         ),
         Positioned.fill(
           child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: _togglePlayPause,
             onDoubleTap: _toggleLike,
           ),
         ),
         Positioned.fill(
-          child: AnimatedOpacity(
-            opacity: _showHeart ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 150),
-            child: const Center(
-              child: Icon(Icons.favorite, color: Colors.white70, size: 96),
+          child: IgnorePointer(
+            ignoring: true,
+            child: AnimatedOpacity(
+              opacity: _showHeart ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 150),
+              child: const Center(
+                child: Icon(Icons.favorite, color: Colors.white70, size: 96),
+              ),
             ),
           ),
         ),
         if (!_initialized || !_controller.value.isPlaying)
-          const Center(
-            child: Icon(Icons.play_arrow_rounded, color: Colors.white70, size: 78),
+          const IgnorePointer(
+            ignoring: true,
+            child: Center(
+              child: Icon(Icons.play_arrow_rounded, color: Colors.white70, size: 78),
+            ),
           ),
         Positioned(
           right: 12,
