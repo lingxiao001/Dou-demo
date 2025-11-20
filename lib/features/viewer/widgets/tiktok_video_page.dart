@@ -105,7 +105,7 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
         Positioned.fill(
           child: _initialized
               ? FittedBox(
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   child: SizedBox(
                     width: _controller.value.size.width,
                     height: _controller.value.size.height,
@@ -116,7 +116,7 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
                   future: _thumbFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
-                      return Image.file(snapshot.data!, fit: BoxFit.cover);
+                      return Image.file(snapshot.data!, fit: BoxFit.contain);
                     }
                     return const ColoredBox(color: Colors.black);
                   },
