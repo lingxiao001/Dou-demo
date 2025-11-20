@@ -16,7 +16,7 @@ class TikTokVideoPage extends StatefulWidget {
   State<TikTokVideoPage> createState() => _TikTokVideoPageState();
 }
 
-class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAliveClientMixin {
+class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   late VideoPlayerController _controller;
   bool _initialized = false;
   bool _pausedByUser = false;
@@ -24,11 +24,13 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   Future<File?>? _thumbFuture;
   bool _showHeart = false;
   bool _muted = false;
+  late AnimationController _rotationController;
 
   @override
   void initState() {
     super.initState();
     _liked = widget.post.isLiked;
+    _rotationController = AnimationController(vsync: this, duration: const Duration(seconds: 8));
     _initializeController();
     _thumbFuture = ThumbnailCacheService()
         .getThumbnail(widget.post.videoUrl)
@@ -55,6 +57,7 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
     if (widget.active && !_pausedByUser) {
       _controller.play();
     }
+    _updateRotation();
     if (mounted) setState(() {});
   }
 
@@ -67,11 +70,13 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
     } else if (!widget.active && _initialized) {
       _controller.pause();
     }
+    _updateRotation();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _rotationController.dispose();
     super.dispose();
   }
 
@@ -85,6 +90,7 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
       _pausedByUser = false;
     }
     setState(() {});
+    _updateRotation();
   }
 
   void _toggleLike() {
@@ -105,6 +111,17 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
     _muted = !_muted;
     _controller.setVolume(_muted ? 0.0 : 1.0);
     setState(() {});
+  }
+
+  void _updateRotation() {
+    if (!_initialized) return;
+    if (_controller.value.isPlaying) {
+      if (!_rotationController.isAnimating) {
+        _rotationController.repeat();
+      }
+    } else {
+      _rotationController.stop();
+    }
   }
 
   @override
@@ -195,6 +212,40 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
                 onPressed: _toggleMute,
               ),
             ],
+          ),
+        ),
+        Positioned(
+          right: 12,
+          bottom: 24,
+          child: IgnorePointer(
+            ignoring: true,
+            child: Column(
+              children: [
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white24, width: 2),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(2),
+                    child: RotationTransition(
+                      turns: _rotationController,
+                      child: CircleAvatar(
+                        radius: 24,
+                        backgroundImage: NetworkImage(widget.post.author.avatarUrl),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  '拍同款',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
+            ),
           ),
         ),
         Positioned(
