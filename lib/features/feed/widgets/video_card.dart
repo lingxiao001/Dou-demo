@@ -5,8 +5,13 @@ import 'package:flutter/material.dart';
 
 class VideoCard extends StatelessWidget {
   final VideoPost videoPost;
+  final VoidCallback? onTap; // 添加点击回调
 
-  const VideoCard({super.key, required this.videoPost});
+  const VideoCard({
+    super.key,
+    required this.videoPost,
+    this.onTap,
+  });
 
   String _formatLikes(int count) {
     if (count >= 10000) {
@@ -17,90 +22,147 @@ class VideoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: FutureBuilder<File>(
-            future: ThumbnailCacheService().getThumbnail(videoPost.videoUrl),
-            builder: (context, snapshot) {
-              Widget image;
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                image = Image.file(
-                  snapshot.data!,
-                  fit: BoxFit.cover,
-                );
-              } else if (snapshot.hasError) {
-                print("Thumbnail generation error: ${snapshot.error}");
-                image = Container(
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.error_outline),
-                );
-              } else {
-                image = Container(
-                  color: Colors.grey.shade200,
-                );
-              }
-              return AspectRatio(
-                aspectRatio: 3 / 4,
-                child: image,
-              );
-            },
+    // 使用 Container + Decoration 实现卡片阴影和背景
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0), // 统一圆角
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 5,
+            spreadRadius: 1,
+            offset: const Offset(0, 2),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          videoPost.title,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 11,
-              child: ClipOval(
-                child: Image.network(
-                  videoPost.author.avatarUrl,
-                  fit: BoxFit.cover,
-                  width: 22,
-                  height: 22,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.person, size: 14);
-                  },
+        ],
+      ),
+      // 使用 ClipRRect 裁剪点击水波纹和图片圆角
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap, // 支持点击事件
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // --- 1. 图片区域 (保持 3:4 比例) ---
+                AspectRatio(
+                  aspectRatio: 3 / 4,
+                  child: FutureBuilder<File>(
+                    future: ThumbnailCacheService().getThumbnail(videoPost.videoUrl),
+                    builder: (context, snapshot) {
+                      Widget image;
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        image = Image.file(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        );
+                      } else {
+                        // 优化加载中和错误状态的样式
+                        image = Container(
+                          color: Colors.grey.shade100,
+                          alignment: Alignment.center,
+                          child: snapshot.hasError
+                              ? Icon(Icons.broken_image, color: Colors.grey.shade400)
+                              : SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        );
+                      }
+                      return image;
+                    },
+                  ),
                 ),
-              ),
+
+                // --- 2. 内容区域 (添加 Padding 防止贴边) ---
+                Padding(
+                  padding: const EdgeInsets.all(8.0), // 上下左右留白
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 标题
+                      Text(
+                        videoPost.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14, //稍微调小一点，显得精致
+                          height: 1.3,
+                          fontWeight: FontWeight.w600, // 半粗体
+                          color: Colors.black87,
+                        ),
+                      ),
+
+                      const SizedBox(height: 6), // 标题和作者栏的间距
+
+                      // 作者与点赞行
+                      Row(
+                        children: [
+                          // 头像
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.grey.shade200, width: 1),
+                            ),
+                            child: CircleAvatar(
+                              radius: 9, // 稍微调小
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: NetworkImage(videoPost.author.avatarUrl),
+                              onBackgroundImageError: (_, __) {},
+                              child: videoPost.author.avatarUrl.isEmpty
+                                  ? const Icon(Icons.person, size: 12, color: Colors.grey)
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+
+                          // 作者名
+                          Expanded(
+                            child: Text(
+                              videoPost.author.nickname,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 12
+                              ),
+                            ),
+                          ),
+
+                          // 点赞图标
+                          Icon(
+                            videoPost.isLiked ? Icons.favorite : Icons.favorite_border_rounded,
+                            size: 14,
+                            color: videoPost.isLiked ? const Color(0xFFFF2C55) : Colors.grey.shade400,
+                          ),
+                          const SizedBox(width: 4),
+
+                          // 点赞数
+                          Text(
+                            _formatLikes(videoPost.likeCount),
+                            style: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 12
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                videoPost.author.nickname,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-              ),
-            ),
-            Icon(
-              videoPost.isLiked ? Icons.favorite : Icons.favorite_border,
-              size: 16,
-              color: videoPost.isLiked ? Colors.red : Colors.grey.shade600,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              _formatLikes(videoPost.likeCount),
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-            ),
-          ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }
