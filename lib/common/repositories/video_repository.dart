@@ -7,14 +7,9 @@ import 'package:flutter/services.dart';
 
 class VideoRepository {
   Future<List<VideoPost>> fetchVideoPosts() async {
-    // 1. 读取 JSON 文件
     final String jsonString = await rootBundle.loadString('assets/mock/videos.json');
-
-    // 2. 解码 JSON
     final List<dynamic> jsonList = json.decode(jsonString);
-
-    // 3. 映射为数据模型
-    return jsonList.map((jsonItem) {
+    final posts = jsonList.map((jsonItem) {
       final authorJson = jsonItem['author'];
       return VideoPost(
         id: jsonItem['id'],
@@ -34,6 +29,13 @@ class VideoRepository {
         createdAt: DateTime.parse(jsonItem['createdAt']),
       );
     }).toList();
+
+    final blockedIds = {
+      '1', '4', '6', '7', '8',
+      '13', '15', '16', '17', '19',
+      '14', '18', '20',
+    };
+    return posts.where((p) => !blockedIds.contains(p.id)).toList();
   }
 
   Future<List<Comment>> fetchComments(String postId) async {
