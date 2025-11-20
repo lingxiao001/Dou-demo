@@ -2,6 +2,7 @@ import 'package:douyin_demo/features/feed/views/feed_grid_screen.dart';
 import 'package:douyin_demo/features/profile/views/profile_screen.dart' as douyin_profile;
 import 'package:douyin_demo/features/live/views/live_screen.dart';
 import 'package:douyin_demo/features/deals/views/group_buy_screen.dart';
+import 'package:douyin_demo/features/ai/widgets/ai_fab.dart';
 import 'package:flutter/material.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           ),
         ],
       );
-      body = TabBarView(
+      final tabView = TabBarView(
         controller: _tabController,
         children: [
           const Center(child: Text("热点内容")),
@@ -64,6 +65,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           const Center(child: Text("经内容")),
         ],
       );
+      body = Stack(children: [tabView, const AiFloatingBall()]);
     } else if (_bottomIndex == 4) {
       body = const SizedBox.expand(child: douyin_profile.ProfileScreen());
     } else {
