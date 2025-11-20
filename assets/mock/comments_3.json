@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c3_1",
+    "postId": "3",
+    "author": { "id": "u201", "nickname": "下饭王", "avatarUrl": "https://randomuser.me/api/portraits/men/28.jpg" },
+    "content": "红烧肉色泽太正了，口水直流。",
+    "createdAt": "2025-11-18T08:50:00Z"
+  },
+  {
+    "id": "c3_2",
+    "postId": "3",
+    "author": { "id": "u202", "nickname": "家常菜", "avatarUrl": "https://randomuser.me/api/portraits/women/29.jpg" },
+    "content": "糖色怎么掌握的？每次我都过头。",
+    "createdAt": "2025-11-18T09:10:00Z"
+  },
+  {
+    "id": "c3_3",
+    "postId": "3",
+    "author": { "id": "u203", "nickname": "会做饭的猫", "avatarUrl": "https://randomuser.me/api/portraits/men/41.jpg" },
+    "content": "配方收藏了，今晚就试试。",
+    "createdAt": "2025-11-18T10:00:00Z"
+  },
+  {
+    "id": "c3_4",
+    "postId": "3",
+    "author": { "id": "u204", "nickname": "小确幸", "avatarUrl": "https://randomuser.me/api/portraits/women/12.jpg" },
+    "content": "火候到位，肉看着就很软糯。",
+    "createdAt": "2025-11-18T11:30:00Z"
+  },
+  {
+    "id": "c3_5",
+    "postId": "3",
+    "author": { "id": "u205", "nickname": "吃货日记", "avatarUrl": "https://randomuser.me/api/portraits/men/12.jpg" },
+    "content": "求电饭锅版本，懒人也想吃。",
+    "createdAt": "2025-11-18T12:00:00Z"
+  }
+]

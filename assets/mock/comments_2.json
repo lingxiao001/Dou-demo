@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c2_1",
+    "postId": "2",
+    "author": { "id": "u101", "nickname": "海风", "avatarUrl": "https://randomuser.me/api/portraits/men/14.jpg" },
+    "content": "海边的镜头太治愈了，周末就该这样放空。",
+    "createdAt": "2025-11-18T09:20:00Z"
+  },
+  {
+    "id": "c2_2",
+    "postId": "2",
+    "author": { "id": "u102", "nickname": "岛上咖啡", "avatarUrl": "https://randomuser.me/api/portraits/women/22.jpg" },
+    "content": "bgm也很搭，求歌单！",
+    "createdAt": "2025-11-18T10:12:00Z"
+  },
+  {
+    "id": "c2_3",
+    "postId": "2",
+    "author": { "id": "u103", "nickname": "旅拍爱好者", "avatarUrl": "https://randomuser.me/api/portraits/men/7.jpg" },
+    "content": "光线太棒了，手机拍的吗？",
+    "createdAt": "2025-11-18T11:05:00Z"
+  },
+  {
+    "id": "c2_4",
+    "postId": "2",
+    "author": { "id": "u104", "nickname": "躺平少女", "avatarUrl": "https://randomuser.me/api/portraits/women/17.jpg" },
+    "content": "看完就想请假去海边～",
+    "createdAt": "2025-11-18T12:40:00Z"
+  },
+  {
+    "id": "c2_5",
+    "postId": "2",
+    "author": { "id": "u105", "nickname": "慢慢", "avatarUrl": "https://randomuser.me/api/portraits/men/33.jpg" },
+    "content": "最后那段镜头推进太丝滑了，赞！",
+    "createdAt": "2025-11-18T13:00:00Z"
+  }
+]

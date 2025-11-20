@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c5_1",
+    "postId": "5",
+    "author": { "id": "u301", "nickname": "街角花店", "avatarUrl": "https://randomuser.me/api/portraits/women/45.jpg" },
+    "content": "滤镜很淡很舒服，城市也能很温柔。",
+    "createdAt": "2025-11-18T07:40:00Z"
+  },
+  {
+    "id": "c5_2",
+    "postId": "5",
+    "author": { "id": "u302", "nickname": "步行到宇宙", "avatarUrl": "https://randomuser.me/api/portraits/men/20.jpg" },
+    "content": "取景太有感觉了，像电影。",
+    "createdAt": "2025-11-18T08:15:00Z"
+  },
+  {
+    "id": "c5_3",
+    "postId": "5",
+    "author": { "id": "u303", "nickname": "摄影研习社", "avatarUrl": "https://randomuser.me/api/portraits/men/36.jpg" },
+    "content": "请问镜头是35mm吗？焦距很像。",
+    "createdAt": "2025-11-18T09:00:00Z"
+  },
+  {
+    "id": "c5_4",
+    "postId": "5",
+    "author": { "id": "u304", "nickname": "慢半拍", "avatarUrl": "https://randomuser.me/api/portraits/women/19.jpg" },
+    "content": "背景音乐太治愈了。",
+    "createdAt": "2025-11-18T10:30:00Z"
+  },
+  {
+    "id": "c5_5",
+    "postId": "5",
+    "author": { "id": "u305", "nickname": "城里人", "avatarUrl": "https://randomuser.me/api/portraits/men/6.jpg" },
+    "content": "这条街在哪？想去走走。",
+    "createdAt": "2025-11-18T11:05:00Z"
+  }
+]

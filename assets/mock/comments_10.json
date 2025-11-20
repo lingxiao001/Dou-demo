@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c10_1",
+    "postId": "10",
+    "author": { "id": "u501", "nickname": "回忆杀", "avatarUrl": "https://randomuser.me/api/portraits/men/18.jpg" },
+    "content": "这段旋律一下把我带回去。",
+    "createdAt": "2025-11-18T07:10:00Z"
+  },
+  {
+    "id": "c10_2",
+    "postId": "10",
+    "author": { "id": "u502", "nickname": "派蒙不是猫", "avatarUrl": "https://randomuser.me/api/portraits/women/44.jpg" },
+    "content": "芭芭拉大招的既视感哈哈。",
+    "createdAt": "2025-11-18T08:05:00Z"
+  },
+  {
+    "id": "c10_3",
+    "postId": "10",
+    "author": { "id": "u503", "nickname": "提瓦特搬砖", "avatarUrl": "https://randomuser.me/api/portraits/men/2.jpg" },
+    "content": "字幕也很走心，点赞。",
+    "createdAt": "2025-11-18T09:12:00Z"
+  },
+  {
+    "id": "c10_4",
+    "postId": "10",
+    "author": { "id": "u504", "nickname": "暖阳", "avatarUrl": "https://randomuser.me/api/portraits/women/52.jpg" },
+    "content": "画面色调好看～",
+    "createdAt": "2025-11-18T10:00:00Z"
+  },
+  {
+    "id": "c10_5",
+    "postId": "10",
+    "author": { "id": "u505", "nickname": "路过的风", "avatarUrl": "https://randomuser.me/api/portraits/men/56.jpg" },
+    "content": "求原视频链接。",
+    "createdAt": "2025-11-18T11:22:00Z"
+  }
+]

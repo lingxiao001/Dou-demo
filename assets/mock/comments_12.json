@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c12_1",
+    "postId": "12",
+    "author": { "id": "u701", "nickname": "新歌循环", "avatarUrl": "https://randomuser.me/api/portraits/men/3.jpg" },
+    "content": "副歌太上头了，循环一整天。",
+    "createdAt": "2025-11-18T07:30:00Z"
+  },
+  {
+    "id": "c12_2",
+    "postId": "12",
+    "author": { "id": "u702", "nickname": "舞步练习生", "avatarUrl": "https://randomuser.me/api/portraits/women/31.jpg" },
+    "content": "求舞蹈分解，想学！",
+    "createdAt": "2025-11-18T08:20:00Z"
+  },
+  {
+    "id": "c12_3",
+    "postId": "12",
+    "author": { "id": "u703", "nickname": "制作人", "avatarUrl": "https://randomuser.me/api/portraits/men/11.jpg" },
+    "content": "编曲细节很丰富，耳机体验更好。",
+    "createdAt": "2025-11-18T09:10:00Z"
+  },
+  {
+    "id": "c12_4",
+    "postId": "12",
+    "author": { "id": "u704", "nickname": "灯光师", "avatarUrl": "https://randomuser.me/api/portraits/women/21.jpg" },
+    "content": "MV灯光太绝了。",
+    "createdAt": "2025-11-18T10:05:00Z"
+  },
+  {
+    "id": "c12_5",
+    "postId": "12",
+    "author": { "id": "u705", "nickname": "听歌写码", "avatarUrl": "https://randomuser.me/api/portraits/men/40.jpg" },
+    "content": "工作效率直线提升哈哈哈。",
+    "createdAt": "2025-11-18T11:00:00Z"
+  }
+]

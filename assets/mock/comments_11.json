@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c11_1",
+    "postId": "11",
+    "author": { "id": "u601", "nickname": "矿工老王", "avatarUrl": "https://randomuser.me/api/portraits/men/60.jpg" },
+    "content": "黑曜石也能发光，文案绝了。",
+    "createdAt": "2025-11-18T06:55:00Z"
+  },
+  {
+    "id": "c11_2",
+    "postId": "11",
+    "author": { "id": "u602", "nickname": "打磨师", "avatarUrl": "https://randomuser.me/api/portraits/women/15.jpg" },
+    "content": "剪辑节奏很稳。",
+    "createdAt": "2025-11-18T07:40:00Z"
+  },
+  {
+    "id": "c11_3",
+    "postId": "11",
+    "author": { "id": "u603", "nickname": "野生文案", "avatarUrl": "https://randomuser.me/api/portraits/men/31.jpg" },
+    "content": "这句台词记下了。",
+    "createdAt": "2025-11-18T08:18:00Z"
+  },
+  {
+    "id": "c11_4",
+    "postId": "11",
+    "author": { "id": "u604", "nickname": "镜头感", "avatarUrl": "https://randomuser.me/api/portraits/women/25.jpg" },
+    "content": "构图挺高级的。",
+    "createdAt": "2025-11-18T09:05:00Z"
+  },
+  {
+    "id": "c11_5",
+    "postId": "11",
+    "author": { "id": "u605", "nickname": "随机路过", "avatarUrl": "https://randomuser.me/api/portraits/men/25.jpg" },
+    "content": "收藏了。",
+    "createdAt": "2025-11-18T10:15:00Z"
+  }
+]
