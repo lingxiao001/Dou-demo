@@ -1,0 +1,50 @@
+[
+  {
+    "id": "g1",
+    "title": "云南高山蜜桃 2斤装",
+    "imageUrl": "https://picsum.photos/seed/deal1/600/600",
+    "price": 29.9,
+    "originalPrice": 59.0,
+    "soldCount": 12560
+  },
+  {
+    "id": "g2",
+    "title": "手冲精品咖啡豆 250g",
+    "imageUrl": "https://picsum.photos/seed/deal2/600/600",
+    "price": 39.0,
+    "originalPrice": 89.0,
+    "soldCount": 8060
+  },
+  {
+    "id": "g3",
+    "title": "户外轻量折叠椅",
+    "imageUrl": "https://picsum.photos/seed/deal3/600/600",
+    "price": 49.9,
+    "originalPrice": 99.0,
+    "soldCount": 5630
+  },
+  {
+    "id": "g4",
+    "title": "真皮小卡包",
+    "imageUrl": "https://picsum.photos/seed/deal4/600/600",
+    "price": 69.0,
+    "originalPrice": 129.0,
+    "soldCount": 3210
+  },
+  {
+    "id": "g5",
+    "title": "便携保温杯 480ml",
+    "imageUrl": "https://picsum.photos/seed/deal5/600/600",
+    "price": 45.0,
+    "originalPrice": 99.0,
+    "soldCount": 9020
+  },
+  {
+    "id": "g6",
+    "title": "夏日防晒帽",
+    "imageUrl": "https://picsum.photos/seed/deal6/600/600",
+    "price": 25.0,
+    "originalPrice": 59.0,
+    "soldCount": 4410
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "l1",
+    "title": "深夜电台：聊聊旅行与摄影",
+    "coverUrl": "https://picsum.photos/seed/live1/600/800",
+    "viewerCount": 15230,
+    "host": { "id": "u901", "nickname": "电台主播·阿岚", "avatarUrl": "https://randomuser.me/api/portraits/women/19.jpg" }
+  },
+  {
+    "id": "l2",
+    "title": "美食现场：红烧肉开锅",
+    "coverUrl": "https://picsum.photos/seed/live2/600/800",
+    "viewerCount": 9803,
+    "host": { "id": "u902", "nickname": "厨里有光", "avatarUrl": "https://randomuser.me/api/portraits/men/32.jpg" }
+  },
+  {
+    "id": "l3",
+    "title": "街头即兴：原声吉他",
+    "coverUrl": "https://picsum.photos/seed/live3/600/800",
+    "viewerCount": 21056,
+    "host": { "id": "u903", "nickname": "远方的风", "avatarUrl": "https://randomuser.me/api/portraits/men/5.jpg" }
+  },
+  {
+    "id": "l4",
+    "title": "露营夜话：星空摄影课堂",
+    "coverUrl": "https://picsum.photos/seed/live4/600/800",
+    "viewerCount": 13560,
+    "host": { "id": "u904", "nickname": "野营指南", "avatarUrl": "https://randomuser.me/api/portraits/women/6.jpg" }
+  },
+  {
+    "id": "l5",
+    "title": "城市骑行：路线分享",
+    "coverUrl": "https://picsum.photos/seed/live5/600/800",
+    "viewerCount": 7560,
+    "host": { "id": "u905", "nickname": "木头船", "avatarUrl": "https://randomuser.me/api/portraits/men/61.jpg" }
+  },
+  {
+    "id": "l6",
+    "title": "数码新品：开箱评测",
+    "coverUrl": "https://picsum.photos/seed/live6/600/800",
+    "viewerCount": 18450,
+    "host": { "id": "u906", "nickname": "数码饭团", "avatarUrl": "https://randomuser.me/api/portraits/women/46.jpg" }
+  }
+]

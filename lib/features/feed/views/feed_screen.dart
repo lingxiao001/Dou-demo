@@ -1,5 +1,7 @@
 import 'package:douyin_demo/features/feed/views/feed_grid_screen.dart';
 import 'package:douyin_demo/features/profile/views/profile_screen.dart' as douyin_profile;
+import 'package:douyin_demo/features/live/views/live_screen.dart';
+import 'package:douyin_demo/features/deals/views/group_buy_screen.dart';
 import 'package:flutter/material.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -54,11 +56,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
         controller: _tabController,
         children: [
           const Center(child: Text("热点内容")),
-          const Center(child: Text("直播内容")),
+          const LiveScreen(),
           FeedGridScreen(onSwitchTab: (i) {
             _tabController.animateTo(i);
           }),
-          const Center(child: Text("团购内容")),
+          const GroupBuyScreen(),
           const Center(child: Text("经内容")),
         ],
       );
