@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
 import 'package:flutter/material.dart';
@@ -36,10 +37,19 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   }
 
   Future<void> _initializeController() async {
-    final file = await VideoAssetCacheService().getLocalFile(widget.post.videoUrl);
-    final c = VideoPlayerController.file(file);
-    await c.initialize();
-    c.setLooping(true);
+    VideoPlayerController c;
+    if (kIsWeb) {
+      c = VideoPlayerController.asset(widget.post.videoUrl);
+      await c.initialize();
+      c.setLooping(true);
+      _muted = true;
+      c.setVolume(0.0);
+    } else {
+      final file = await VideoAssetCacheService().getLocalFile(widget.post.videoUrl);
+      c = VideoPlayerController.file(file);
+      await c.initialize();
+      c.setLooping(true);
+    }
     _controller = c;
     _initialized = true;
     if (widget.active && !_pausedByUser) {
