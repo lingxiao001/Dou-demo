@@ -4,6 +4,7 @@ import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
 import 'package:flutter/material.dart';
 import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
+import 'package:douyin_demo/features/viewer/widgets/comment_sheet.dart';
 import 'package:video_player/video_player.dart';
 
 class TikTokVideoPage extends StatefulWidget {
@@ -25,11 +26,13 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   bool _showHeart = false;
   bool _muted = false;
   late AnimationController _rotationController;
+  late int _commentCount;
 
   @override
   void initState() {
     super.initState();
     _liked = widget.post.isLiked;
+    _commentCount = widget.post.commentCount;
     _rotationController = AnimationController(vsync: this, duration: const Duration(seconds: 8));
     _initializeController();
     _thumbFuture = ThumbnailCacheService()
@@ -105,6 +108,20 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
         });
       }
     });
+  }
+
+  Future<void> _openComments() async {
+    final updated = await showModalBottomSheet<int>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CommentSheet(post: widget.post),
+    );
+    if (updated != null) {
+      setState(() {
+        _commentCount = updated;
+      });
+    }
   }
 
   void _toggleMute() {
@@ -196,7 +213,8 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
               _ActionIcon(
                 icon: Icons.comment,
                 color: Colors.white,
-                label: widget.post.commentCount.toString(),
+                label: _commentCount.toString(),
+                onPressed: _openComments,
               ),
               const SizedBox(height: 20),
               _ActionIcon(
