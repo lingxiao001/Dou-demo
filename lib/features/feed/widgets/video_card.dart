@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
 import 'package:flutter/material.dart';
+import 'package:douyin_demo/common/services/web_thumbnail_service_stub.dart'
+    if (dart.library.html) 'package:douyin_demo/common/services/web_thumbnail_service.dart';
 
 class VideoCard extends StatelessWidget {
   final VideoPost videoPost;
@@ -49,37 +53,52 @@ class VideoCard extends StatelessWidget {
                 // --- 1. 图片区域 (保持 3:4 比例) ---
                 AspectRatio(
                   aspectRatio: 3 / 4,
-                  child: FutureBuilder<File>(
-                    future: ThumbnailCacheService().getThumbnail(videoPost.videoUrl),
-                    builder: (context, snapshot) {
-                      Widget image;
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        image = Image.file(
-                          snapshot.data!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        );
-                      } else {
-                        // 优化加载中和错误状态的样式
-                        image = Container(
-                          color: Colors.grey.shade100,
-                          alignment: Alignment.center,
-                          child: snapshot.hasError
-                              ? Icon(Icons.broken_image, color: Colors.grey.shade400)
-                              : SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.grey.shade400,
-                            ),
-                          ),
-                        );
-                      }
-                      return image;
-                    },
-                  ),
+                  child: kIsWeb
+                      ? FutureBuilder<Uint8List?>(
+                          future: generateThumbnail(videoPost.videoUrl),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data != null) {
+                              return Image.memory(snapshot.data!, fit: BoxFit.cover, width: double.infinity);
+                            }
+                            return Container(
+                              color: Colors.grey.shade100,
+                              alignment: Alignment.center,
+                              child: snapshot.hasError
+                                  ? Icon(Icons.broken_image, color: Colors.grey.shade400)
+                                  : SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey.shade400),
+                                    ),
+                            );
+                          },
+                        )
+                      : FutureBuilder<File>(
+                          future: ThumbnailCacheService().getThumbnail(videoPost.videoUrl),
+                          builder: (context, snapshot) {
+                            Widget image;
+                            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                              image = Image.file(
+                                snapshot.data!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              );
+                            } else {
+                              image = Container(
+                                color: Colors.grey.shade100,
+                                alignment: Alignment.center,
+                                child: snapshot.hasError
+                                    ? Icon(Icons.broken_image, color: Colors.grey.shade400)
+                                    : SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey.shade400),
+                                      ),
+                              );
+                            }
+                            return image;
+                          },
+                        ),
                 ),
 
                 // --- 2. 内容区域 (添加 Padding 防止贴边) ---

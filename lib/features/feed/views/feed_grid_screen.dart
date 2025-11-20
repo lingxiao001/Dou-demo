@@ -36,42 +36,42 @@ class _FeedGridScreenState extends State<FeedGridScreen> {
           }
           final posts = snapshot.data!;
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(10), // 统一外边距
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10, // 卡片上下间距
-              crossAxisSpacing: 10, // 卡片左右间距
+          return LayoutBuilder(builder: (context, constraints) {
+            const padding = 10.0;
+            const crossSpacing = 10.0;
+            const columns = 2;
+            final tileWidth = (constraints.maxWidth - padding * 2 - crossSpacing) / columns;
+            const contentHeight = 100.0;
+            final tileHeight = tileWidth * (4 / 3) + contentHeight;
+            final ratio = tileWidth / tileHeight;
 
-              // ==============================================
-              // 【核心修改】解决溢出问题的关键
-              // 3/4 = 0.75 (太短了，只够放图片)
-              // 改为 0.58 (让卡片变长，容纳下方文字)
-              // 如果文字还是溢出，可以试着改成 0.5--已经修改
-              // ==============================================
-              childAspectRatio: 0.50,
-            ),
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              final post = posts[index];
-
-              // 使用我们刚才美化过的 VideoCard
-              // 直接传入 onTap，让 VideoCard 内部的 InkWell 处理点击（会有水波纹效果）
-              return VideoCard(
-                videoPost: post,
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => ViewerScreen(
-                        posts: posts,
-                        initialIndex: index,
+            return GridView.builder(
+              padding: const EdgeInsets.all(padding),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                mainAxisSpacing: crossSpacing,
+                crossAxisSpacing: crossSpacing,
+                childAspectRatio: ratio,
+              ),
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                return VideoCard(
+                  videoPost: post,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ViewerScreen(
+                          posts: posts,
+                          initialIndex: index,
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            },
-          );
+                    );
+                  },
+                );
+              },
+            );
+          });
         },
       ),
     );
