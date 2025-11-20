@@ -29,13 +29,7 @@ class VideoRepository {
         createdAt: DateTime.parse(jsonItem['createdAt']),
       );
     }).toList();
-
-    final blockedIds = {
-      '1', '4', '6', '7', '8',
-      '13', '15', '16', '17', '19',
-      '14', '18', '20',
-    };
-    return posts.where((p) => !blockedIds.contains(p.id)).toList();
+    return posts;
   }
 
   Future<List<Comment>> fetchComments(String postId) async {
