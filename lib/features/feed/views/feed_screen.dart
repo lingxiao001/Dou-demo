@@ -1,4 +1,5 @@
 import 'package:douyin_demo/features/feed/views/feed_grid_screen.dart';
+import 'package:douyin_demo/features/profile/views/profile_screen.dart' as douyin_profile;
 import 'package:flutter/material.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -10,6 +11,7 @@ class FeedScreen extends StatefulWidget {
 
 class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  int _bottomIndex = 0;
 
   final List<String> _tabs = ["热点", "直播", "精选", "团购", "经"];
 
@@ -27,8 +29,10 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    Widget body;
+    PreferredSizeWidget? appBar;
+    if (_bottomIndex == 0) {
+      appBar = AppBar(
         title: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -45,17 +49,26 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             onPressed: () {},
           ),
         ],
-      ),
-      body: TabBarView(
+      );
+      body = TabBarView(
         controller: _tabController,
-        children: [
-          const Center(child: Text("热点内容")),
-          const Center(child: Text("直播内容")),
-          const FeedGridScreen(), // Our main feed content
-          const Center(child: Text("团购内容")),
-          const Center(child: Text("经内容")),
+        children: const [
+          Center(child: Text("热点内容")),
+          Center(child: Text("直播内容")),
+          FeedGridScreen(),
+          Center(child: Text("团购内容")),
+          Center(child: Text("经内容")),
         ],
-      ),
+      );
+    } else if (_bottomIndex == 4) {
+      body = const SizedBox.expand(child: douyin_profile.ProfileScreen());
+    } else {
+      body = const Center(child: Text('暂未实现'));
+    }
+
+    return Scaffold(
+      appBar: appBar,
+      body: body,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -79,7 +92,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             label: '我',
           ),
         ],
-        currentIndex: 0,
+        currentIndex: _bottomIndex,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey.shade600,
         type: BottomNavigationBarType.fixed,
@@ -87,6 +100,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
         showUnselectedLabels: true,
         selectedFontSize: 12,
         unselectedFontSize: 12,
+        onTap: (i) {
+          setState(() {
+            _bottomIndex = i;
+          });
+        },
       ),
     );
   }
