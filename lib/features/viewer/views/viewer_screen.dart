@@ -19,6 +19,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
   late final PageController _pageController;
   int _currentIndex = 0;
   late Future<List<VideoPost>> _futurePosts;
+  double _dragX = 0.0;
 
   @override
   void initState() {
@@ -40,7 +41,23 @@ class _ViewerScreenState extends State<ViewerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: FutureBuilder<List<VideoPost>>(
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: (_) {
+          _dragX = 0.0;
+        },
+        onHorizontalDragUpdate: (details) {
+          _dragX += details.delta.dx;
+        },
+        onHorizontalDragEnd: (details) {
+          final vx = details.velocity.pixelsPerSecond.dx;
+          if (_dragX < -80 || vx < -500) {
+            Navigator.of(context).pop(3);
+          } else if (_dragX > 80 || vx > 500) {
+            Navigator.of(context).pop(1);
+          }
+        },
+        child: FutureBuilder<List<VideoPost>>(
         future: _futurePosts,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -98,6 +115,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
           );
         },
       ),
+    ),
     );
   }
 }

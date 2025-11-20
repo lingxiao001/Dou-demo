@@ -52,12 +52,14 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       );
       body = TabBarView(
         controller: _tabController,
-        children: const [
-          Center(child: Text("热点内容")),
-          Center(child: Text("直播内容")),
-          FeedGridScreen(),
-          Center(child: Text("团购内容")),
-          Center(child: Text("经内容")),
+        children: [
+          const Center(child: Text("热点内容")),
+          const Center(child: Text("直播内容")),
+          FeedGridScreen(onSwitchTab: (i) {
+            _tabController.animateTo(i);
+          }),
+          const Center(child: Text("团购内容")),
+          const Center(child: Text("经内容")),
         ],
       );
     } else if (_bottomIndex == 4) {

@@ -5,7 +5,8 @@ import 'package:douyin_demo/features/viewer/views/viewer_screen.dart';
 import 'package:flutter/material.dart';
 
 class FeedGridScreen extends StatefulWidget {
-  const FeedGridScreen({super.key});
+  final ValueChanged<int>? onSwitchTab;
+  const FeedGridScreen({super.key, this.onSwitchTab});
 
   @override
   State<FeedGridScreen> createState() => _FeedGridScreenState();
@@ -59,14 +60,20 @@ class _FeedGridScreenState extends State<FeedGridScreen> {
                 return VideoCard(
                   videoPost: post,
                   onTap: () {
-                    Navigator.of(context).push(
+                    Navigator.of(context)
+                        .push<int>(
                       MaterialPageRoute(
                         builder: (_) => ViewerScreen(
                           posts: posts,
                           initialIndex: index,
                         ),
                       ),
-                    );
+                    )
+                        .then((value) {
+                      if (value != null && widget.onSwitchTab != null) {
+                        widget.onSwitchTab!(value);
+                      }
+                    });
                   },
                 );
               },
