@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
 import 'package:video_player/video_player.dart';
 
 class TikTokVideoPage extends StatefulWidget {
@@ -25,7 +23,6 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   Future<File?>? _thumbFuture;
   bool _showHeart = false;
   bool _muted = false;
-  String? _tempPath;
 
   @override
   void initState() {
@@ -39,35 +36,18 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   }
 
   Future<void> _initializeController() async {
-    try {
-      final c = VideoPlayerController.asset(widget.post.videoUrl);
-      await c.initialize();
-      c.setLooping(true);
-      _controller = c;
-      _initialized = true;
-    } catch (_) {
-      final file = await _assetToTemp(widget.post.videoUrl);
-      final c = VideoPlayerController.file(file);
-      await c.initialize();
-      c.setLooping(true);
-      _controller = c;
-      _initialized = true;
-    }
+    final file = await VideoAssetCacheService().getLocalFile(widget.post.videoUrl);
+    final c = VideoPlayerController.file(file);
+    await c.initialize();
+    c.setLooping(true);
+    _controller = c;
+    _initialized = true;
     if (widget.active && !_pausedByUser) {
       _controller.play();
     }
     if (mounted) setState(() {});
   }
 
-  Future<File> _assetToTemp(String assetPath) async {
-    final bytes = await rootBundle.load(assetPath);
-    final dir = await getTemporaryDirectory();
-    final filename = assetPath.split('/').last;
-    final tmp = File(p.join(dir.path, 'vid_${DateTime.now().microsecondsSinceEpoch}_$filename'));
-    await tmp.writeAsBytes(bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
-    _tempPath = tmp.path;
-    return tmp;
-  }
 
   @override
   void didUpdateWidget(covariant TikTokVideoPage oldWidget) {
@@ -82,11 +62,6 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   @override
   void dispose() {
     _controller.dispose();
-    if (_tempPath != null) {
-      try {
-        File(_tempPath!).deleteSync();
-      } catch (_) {}
-    }
     super.dispose();
   }
 

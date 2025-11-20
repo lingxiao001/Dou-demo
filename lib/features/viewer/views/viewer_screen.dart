@@ -1,6 +1,7 @@
 import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/repositories/video_repository.dart';
 import 'package:douyin_demo/features/viewer/widgets/tiktok_video_page.dart';
+import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
 import 'package:flutter/material.dart';
 
 class ViewerScreen extends StatefulWidget {
@@ -59,6 +60,12 @@ class _ViewerScreenState extends State<ViewerScreen> {
                   setState(() {
                     _currentIndex = index;
                   });
+                  final svc = VideoAssetCacheService();
+                  final toPrefetch = <String>[];
+                  toPrefetch.add(posts[index].videoUrl);
+                  if (index + 1 < posts.length) toPrefetch.add(posts[index + 1].videoUrl);
+                  if (index - 1 >= 0) toPrefetch.add(posts[index - 1].videoUrl);
+                  svc.prefetch(toPrefetch);
                 },
                 itemBuilder: (context, index) {
                   final active = index == _currentIndex;
