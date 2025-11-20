@@ -1,8 +1,8 @@
 import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/repositories/video_repository.dart';
 import 'package:douyin_demo/features/feed/widgets/video_card.dart';
+import 'package:douyin_demo/features/viewer/views/viewer_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class FeedGridScreen extends StatefulWidget {
   const FeedGridScreen({super.key});
@@ -12,40 +12,50 @@ class FeedGridScreen extends StatefulWidget {
 }
 
 class _FeedGridScreenState extends State<FeedGridScreen> {
-  final VideoRepository _repository = VideoRepository();
-  late Future<List<VideoPost>> _videoPostsFuture;
+  late final Future<List<VideoPost>> _futurePosts;
 
   @override
   void initState() {
     super.initState();
-    _videoPostsFuture = _repository.fetchVideoPosts();
+    _futurePosts = VideoRepository().fetchVideoPosts();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<VideoPost>>(
-      future: _videoPostsFuture,
+      future: _futurePosts,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snapshot.hasError) {
-          return Center(child: Text("加载失败: ${snapshot.error}"));
-        }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text("没有视频内容"));
+          return const Center(child: Text('暂无内容'));
         }
-
-        final videoPosts = snapshot.data!;
-
-        return MasonryGridView.count(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-          crossAxisCount: 2,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          itemCount: videoPosts.length,
+        final posts = snapshot.data!;
+        return GridView.builder(
+          padding: const EdgeInsets.all(12),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 3 / 4,
+          ),
+          itemCount: posts.length,
           itemBuilder: (context, index) {
-            return VideoCard(videoPost: videoPosts[index]);
+            final post = posts[index];
+            return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ViewerScreen(
+                      posts: posts,
+                      initialIndex: index,
+                    ),
+                  ),
+                );
+              },
+              child: VideoCard(videoPost: post),
+            );
           },
         );
       },
