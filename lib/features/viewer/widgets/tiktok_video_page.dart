@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
@@ -6,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
 import 'package:douyin_demo/features/viewer/widgets/comment_sheet.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:douyin_demo/common/LLMapi/llm_api.dart';
+import 'package:douyin_demo/common/services/api_key_service.dart';
 
 class TikTokVideoPage extends StatefulWidget {
   final VideoPost post;
@@ -27,6 +31,13 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   bool _muted = false;
   late AnimationController _rotationController;
   late int _commentCount;
+  bool _showAi = false;
+  bool _aiLoading = false;
+  String? _aiReply;
+  String? _aiDataUrl;
+  Uint8List? _aiImageBytes;
+  final TextEditingController _aiController = TextEditingController();
+  bool _wasPlayingBeforeAi = false;
 
   @override
   void initState() {
@@ -80,6 +91,7 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   void dispose() {
     _controller.dispose();
     _rotationController.dispose();
+    _aiController.dispose();
     super.dispose();
   }
 
@@ -138,6 +150,69 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
       }
     } else {
       _rotationController.stop();
+    }
+  }
+
+  Future<void> _onAiTap() async {
+    if (!_initialized) return;
+    _wasPlayingBeforeAi = _controller.value.isPlaying;
+    _controller.pause();
+    _pausedByUser = true;
+    final file = await VideoAssetCacheService().getLocalFile(widget.post.videoUrl);
+    final ms = _controller.value.position.inMilliseconds;
+    final bytes = await VideoThumbnail.thumbnailData(
+      video: file.path,
+      imageFormat: ImageFormat.JPEG,
+      timeMs: ms > 0 ? ms : 0,
+      quality: 75,
+    );
+    if (bytes != null) {
+      _aiImageBytes = bytes;
+      _aiDataUrl = 'data:image/jpeg;base64,' + base64Encode(bytes);
+    } else {
+      _aiImageBytes = await VideoThumbnail.thumbnailData(video: file.path, imageFormat: ImageFormat.JPEG, quality: 75);
+      if (_aiImageBytes != null) {
+        _aiDataUrl = 'data:image/jpeg;base64,' + base64Encode(_aiImageBytes!);
+      }
+    }
+    _aiReply = null;
+    _aiController.clear();
+    setState(() {
+      _showAi = true;
+    });
+  }
+
+  Future<void> _sendAi() async {
+    final text = _aiController.text.trim();
+    if (text.isEmpty || _aiLoading || _aiDataUrl == null) return;
+    setState(() {
+      _aiLoading = true;
+      _aiReply = null;
+    });
+    try {
+      final r = await LLMapi().chatVision(imageUrl: _aiDataUrl!, prompt: text);
+      if (!mounted) return;
+      setState(() {
+        _aiReply = r;
+        _aiLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _aiReply = '$e';
+        _aiLoading = false;
+      });
+    }
+  }
+
+  void _closeAi() {
+    setState(() {
+      _showAi = false;
+    });
+    if (_wasPlayingBeforeAi && _initialized) {
+      _controller.play();
+      _pausedByUser = false;
+      _updateRotation();
     }
   }
 
@@ -233,6 +308,19 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
           ),
         ),
         Positioned(
+          left: 12,
+          bottom: 100,
+          child: InkWell(
+            onTap: _onAiTap,
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(color: Colors.black54, shape: BoxShape.circle, border: Border.all(color: Colors.white24)),
+              child: const Icon(Icons.smart_toy, color: Colors.white, size: 24),
+            ),
+          ),
+        ),
+        Positioned(
           right: 12,
           bottom: 24,
           child: IgnorePointer(
@@ -308,6 +396,104 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
             ],
           ),
         ),
+        if (_showAi)
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: Container(
+              width: 320,
+              constraints: const BoxConstraints(minHeight: 220),
+              decoration: BoxDecoration(color: Colors.black.withOpacity(0.7), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white24)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(width: 8),
+                      const Icon(Icons.smart_toy, color: Colors.white70, size: 18),
+                      const SizedBox(width: 6),
+                      const Expanded(child: Text('AI', style: TextStyle(color: Colors.white, fontSize: 13))),
+                      IconButton(
+                        onPressed: () async {
+                          final controller = TextEditingController();
+                          final key = await ApiKeyService().loadArkKey() ?? '';
+                          controller.text = key;
+                          final v = await showDialog<String>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Colors.black87,
+                              content: TextField(
+                                controller: controller,
+                                style: const TextStyle(color: Colors.white),
+                                decoration: const InputDecoration(
+                                  hintText: '输入 Ark API Key',
+                                  hintStyle: TextStyle(color: Colors.white54),
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+                                TextButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('保存')),
+                              ],
+                            ),
+                          );
+                          if (v != null && v.isNotEmpty) {
+                            await ApiKeyService().saveArkKey(v);
+                            if (mounted) setState(() {});
+                          }
+                        },
+                        icon: const Icon(Icons.vpn_key, color: Colors.white70, size: 18),
+                      ),
+                      IconButton(onPressed: _closeAi, icon: const Icon(Icons.close, color: Colors.white70, size: 18)),
+                    ],
+                  ),
+                  if (_aiImageBytes != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.memory(_aiImageBytes!, height: 120, fit: BoxFit.cover),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: TextField(
+                      controller: _aiController,
+                      decoration: const InputDecoration(hintText: '向当前画面提问...', hintStyle: TextStyle(color: Colors.white54), filled: true, fillColor: Colors.white12, border: OutlineInputBorder()),
+                      style: const TextStyle(color: Colors.white),
+                      minLines: 1,
+                      maxLines: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _aiLoading ? null : _sendAi,
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.white24),
+                            child: _aiLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('发送', style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_aiReply != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(8)),
+                        child: Text(_aiReply!, style: const TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }
