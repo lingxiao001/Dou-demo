@@ -1,34 +1,29 @@
 import 'package:douyin_demo/common/models/video_post.dart';
-import 'package:douyin_demo/common/repositories/video_repository.dart';
+import 'package:douyin_demo/features/viewer/viewmodels/viewer_view_model.dart';
 import 'package:douyin_demo/features/viewer/widgets/tiktok_video_page.dart';
 import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ViewerScreen extends StatefulWidget {
+class ViewerScreen extends ConsumerStatefulWidget {
   final List<VideoPost>? posts;
   final int initialIndex;
 
   const ViewerScreen({super.key, this.posts, this.initialIndex = 0});
 
   @override
-  State<ViewerScreen> createState() => _ViewerScreenState();
+  ConsumerState<ViewerScreen> createState() => _ViewerScreenState();
 }
 
-class _ViewerScreenState extends State<ViewerScreen> {
+class _ViewerScreenState extends ConsumerState<ViewerScreen> {
   late final PageController _pageController;
-  int _currentIndex = 0;
-  late Future<List<VideoPost>> _futurePosts;
   double _dragX = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: widget.initialIndex);
-    _futurePosts = widget.posts != null
-        ? Future.value(widget.posts)
-        : VideoRepository().fetchVideoPosts();
   }
 
   @override
@@ -39,6 +34,8 @@ class _ViewerScreenState extends State<ViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final postsAsync = ref.watch(viewerPostsProvider(widget.posts));
+    final currentIndex = ref.watch(viewerIndexProvider(widget.initialIndex));
     return Scaffold(
       backgroundColor: Colors.black,
       body: GestureDetector(
@@ -57,16 +54,10 @@ class _ViewerScreenState extends State<ViewerScreen> {
             Navigator.of(context).pop(1);
           }
         },
-        child: FutureBuilder<List<VideoPost>>(
-        future: _futurePosts,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('暂无视频', style: TextStyle(color: Colors.white)));
-          }
-          final posts = snapshot.data!;
+        child: postsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('$err', style: const TextStyle(color: Colors.white))),
+          data: (posts) {
           return Stack(
             children: [
               PageView.builder(
@@ -75,9 +66,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                 allowImplicitScrolling: true,
                 itemCount: posts.length,
                 onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
+                  ref.read(viewerIndexProvider(widget.initialIndex).notifier).set(index);
                   if (!kIsWeb) {
                     final svc = VideoAssetCacheService();
                     final toPrefetch = <String>[];
@@ -88,7 +77,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                   }
                 },
                 itemBuilder: (context, index) {
-                  final active = index == _currentIndex;
+                  final active = index == currentIndex;
                   return TikTokVideoPage(post: posts[index], active: active);
                 },
               ),
