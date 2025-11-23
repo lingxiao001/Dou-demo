@@ -17,24 +17,17 @@ class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(feedGridViewModelProvider.notifier).load());
   }
 
   @override
   Widget build(BuildContext context) {
-    final vm = ref.watch(feedGridViewModelProvider);
-    // 给页面添加一个浅灰背景色，让白色卡片更明显
+    final postsAsync = ref.watch(feedGridViewModelProvider);
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F4),
-      body: Builder(builder: (context) {
-          if (vm.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (vm.error != null) {
-            return Center(child: Text(vm.error!));
-          }
-          final posts = vm.posts;
-
+      body: postsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('$err')),
+        data: (posts) {
           return LayoutBuilder(builder: (context, constraints) {
             const padding = 10.0;
             const crossSpacing = 10.0;
@@ -77,7 +70,8 @@ class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
               },
             );
           });
-      }),
+        },
+      ),
     );
   }
 }
