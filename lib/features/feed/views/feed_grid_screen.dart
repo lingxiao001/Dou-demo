@@ -1,41 +1,39 @@
-import 'package:douyin_demo/common/models/video_post.dart';
-import 'package:douyin_demo/common/repositories/video_repository.dart';
 import 'package:douyin_demo/features/feed/widgets/video_card.dart';
 import 'package:douyin_demo/features/viewer/views/viewer_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:douyin_demo/features/feed/viewmodels/feed_grid_view_model.dart';
 
-class FeedGridScreen extends StatefulWidget {
+class FeedGridScreen extends ConsumerStatefulWidget {
   final ValueChanged<int>? onSwitchTab;
   const FeedGridScreen({super.key, this.onSwitchTab});
 
   @override
-  State<FeedGridScreen> createState() => _FeedGridScreenState();
+  ConsumerState<FeedGridScreen> createState() => _FeedGridScreenState();
 }
 
-class _FeedGridScreenState extends State<FeedGridScreen> {
-  late final Future<List<VideoPost>> _futurePosts;
+class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
 
   @override
   void initState() {
     super.initState();
-    _futurePosts = VideoRepository().fetchVideoPosts();
+    Future.microtask(() => ref.read(feedGridViewModelProvider.notifier).load());
   }
 
   @override
   Widget build(BuildContext context) {
+    final vm = ref.watch(feedGridViewModelProvider);
     // 给页面添加一个浅灰背景色，让白色卡片更明显
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F4),
-      body: FutureBuilder<List<VideoPost>>(
-        future: _futurePosts,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
+      body: Builder(builder: (context) {
+          if (vm.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('暂无内容'));
+          if (vm.error != null) {
+            return Center(child: Text(vm.error!));
           }
-          final posts = snapshot.data!;
+          final posts = vm.posts;
 
           return LayoutBuilder(builder: (context, constraints) {
             const padding = 10.0;
@@ -79,8 +77,7 @@ class _FeedGridScreenState extends State<FeedGridScreen> {
               },
             );
           });
-        },
-      ),
+      }),
     );
   }
 }
