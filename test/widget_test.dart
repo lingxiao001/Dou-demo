@@ -8,11 +8,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:douyin_demo/main.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   testWidgets('App loads feed screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(const MyApp());
     expect(find.byType(BottomNavigationBar), findsOneWidget);
     expect(find.text('消息'), findsOneWidget);
   });

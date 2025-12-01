@@ -10,10 +10,16 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Instantiate a FlutterEngine.
         flutterEngine = FlutterEngine(this)
+
+        // Start executing Dart code to pre-warm the FlutterEngine.
         flutterEngine.dartExecutor.executeDartEntrypoint(
             DartExecutor.DartEntrypoint.createDefault()
         )
+
+        // Cache the FlutterEngine to be used by FlutterFragment.
         FlutterEngineCache
             .getInstance()
             .put("main_engine", flutterEngine)
