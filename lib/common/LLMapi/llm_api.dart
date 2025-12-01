@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:douyin_demo/common/services/api_key_service.dart';
+import 'package:douyin_demo/common/LLMapi/key_injected.dart';
 
 class LLMapi {
   final String base;
@@ -33,7 +34,16 @@ class LLMapi {
       ]
     };
     final env = const String.fromEnvironment('ARK_API_KEY', defaultValue: '');
-    String key = (apiKey ?? '').isNotEmpty ? apiKey! : (env.isNotEmpty ? env : (await ApiKeyService().loadArkKey() ?? ''));
+    String key = '';
+    if (kInjectedArkApiKey.isNotEmpty) {
+      key = kInjectedArkApiKey;
+    } else if ((apiKey ?? '').isNotEmpty) {
+      key = apiKey!;
+    } else if (env.isNotEmpty) {
+      key = env;
+    } else {
+      key = await ApiKeyService().loadArkKey() ?? '';
+    }
     final headers1 = {
       'Content-Type': 'application/json',
       if (key.isNotEmpty) 'Authorization': 'Bearer $key',
