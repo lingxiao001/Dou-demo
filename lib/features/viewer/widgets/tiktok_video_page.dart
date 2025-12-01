@@ -8,20 +8,21 @@ import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
 import 'package:douyin_demo/features/viewer/widgets/comment_sheet.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
-import 'package:douyin_demo/common/LLMapi/llm_api.dart';
+import 'package:douyin_demo/common/providers/app_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:douyin_demo/common/services/api_key_service.dart';
 
-class TikTokVideoPage extends StatefulWidget {
+class TikTokVideoPage extends ConsumerStatefulWidget {
   final VideoPost post;
   final bool active;
 
   const TikTokVideoPage({super.key, required this.post, required this.active});
 
   @override
-  State<TikTokVideoPage> createState() => _TikTokVideoPageState();
+  ConsumerState<TikTokVideoPage> createState() => _TikTokVideoPageState();
 }
 
-class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
+class _TikTokVideoPageState extends ConsumerState<TikTokVideoPage> with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   late VideoPlayerController _controller;
   bool _initialized = false;
   bool _pausedByUser = false;
@@ -168,11 +169,11 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
     );
     if (bytes != null) {
       _aiImageBytes = bytes;
-      _aiDataUrl = 'data:image/jpeg;base64,' + base64Encode(bytes);
+      _aiDataUrl = 'data:image/jpeg;base64,${base64Encode(bytes)}';
     } else {
       _aiImageBytes = await VideoThumbnail.thumbnailData(video: file.path, imageFormat: ImageFormat.JPEG, quality: 75);
       if (_aiImageBytes != null) {
-        _aiDataUrl = 'data:image/jpeg;base64,' + base64Encode(_aiImageBytes!);
+        _aiDataUrl = 'data:image/jpeg;base64,${base64Encode(_aiImageBytes!)}';
       }
     }
     _aiReply = null;
@@ -190,7 +191,8 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
       _aiReply = null;
     });
     try {
-      final r = await LLMapi().chatVision(imageUrl: _aiDataUrl!, prompt: text);
+      final api = ref.read(llmApiProvider);
+      final r = await api.chatVision(imageUrl: _aiDataUrl!, prompt: text);
       if (!mounted) return;
       setState(() {
         _aiReply = r;

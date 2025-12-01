@@ -1,13 +1,17 @@
 import 'package:douyin_demo/common/services/ai_chat_service.dart';
+import 'package:douyin_demo/common/providers/app_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
-class AiChatSheet extends StatefulWidget {
+import '../viewmodels/ai_settings_view_model.dart';
+
+class AiChatSheet extends ConsumerStatefulWidget {
   const AiChatSheet({super.key});
   @override
-  State<AiChatSheet> createState() => _AiChatSheetState();
+  ConsumerState<AiChatSheet> createState() => _AiChatSheetState();
 }
 
-class _AiChatSheetState extends State<AiChatSheet> {
+class _AiChatSheetState extends ConsumerState<AiChatSheet> {
   final List<AiChatMessage> _messages = [];
   final TextEditingController _controller = TextEditingController();
   bool _loading = false;
@@ -26,7 +30,8 @@ class _AiChatSheetState extends State<AiChatSheet> {
       _loading = true;
       _controller.clear();
     });
-    final reply = await AiChatService().send(_messages);
+    final svc = ref.read(aiChatServiceProvider);
+    final reply = await svc.send(_messages);
     if (!mounted) return;
     setState(() {
       _messages.add(AiChatMessage('assistant', reply));
@@ -46,6 +51,46 @@ class _AiChatSheetState extends State<AiChatSheet> {
               child: Row(
                 children: [
                   const Expanded(child: Text('AI聊天', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
+                  IconButton(
+                    icon: const Icon(Icons.link),
+                    onPressed: () async {
+                      final ctrl = TextEditingController();
+                      final v = await showDialog<String>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('设置 Base URL'),
+                          content: TextField(controller: ctrl),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+                            TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('保存')),
+                          ],
+                        ),
+                      );
+                      if (v != null && v.isNotEmpty) {
+                        await ref.read(aiSettingsProvider.notifier).saveBaseUrl(v);
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.vpn_key),
+                    onPressed: () async {
+                      final ctrl = TextEditingController();
+                      final v = await showDialog<String>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('设置 API Key'),
+                          content: TextField(controller: ctrl, obscureText: true),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+                            TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('保存')),
+                          ],
+                        ),
+                      );
+                      if (v != null && v.isNotEmpty) {
+                        await ref.read(aiSettingsProvider.notifier).saveApiKey(v);
+                      }
+                    },
+                  ),
                   IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close))
                 ],
               ),
@@ -108,4 +153,3 @@ class _AiChatSheetState extends State<AiChatSheet> {
     );
   }
 }
-

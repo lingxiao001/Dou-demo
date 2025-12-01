@@ -12,13 +12,19 @@ class AiChatMessage {
 }
 
 class AiChatService {
+  final String? baseUrl;
+  final String? apiKey;
+  final String? modelName;
   String? _lastError;
+  AiChatService({this.baseUrl, this.apiKey, this.modelName});
+
   Future<String> send(List<AiChatMessage> messages) async {
-    var r1 = await _postChatCompletions(messages);
+    final base = baseUrl ?? kForumHostBaseUrl;
+    var r1 = await _postChatCompletions(messages, base: base);
     if (r1 != null) return r1;
-    var r2 = await _postResponses(messages);
+    var r2 = await _postResponses(messages, base: base);
     if (r2 != null) return r2;
-    final alt = _altBase(kForumHostBaseUrl);
+    final alt = _altBase(base);
     if (alt != null) {
       r1 = await _postChatCompletions(messages, base: alt);
       if (r1 != null) return r1;
@@ -31,13 +37,13 @@ class AiChatService {
   Future<String?> _postChatCompletions(List<AiChatMessage> messages, {String? base}) async {
     final url = Uri.parse(_join(base ?? kForumHostBaseUrl, '/chat/completions'));
     final body = {
-      'model': kForumHostModelName,
+      'model': modelName ?? kForumHostModelName,
       'messages': messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
       'temperature': 0.7,
     };
     final headers1 = {
       'Content-Type': 'application/json',
-      if (kForumHostApiKey.isNotEmpty) 'Authorization': 'Bearer $kForumHostApiKey',
+      if ((apiKey ?? kForumHostApiKey).isNotEmpty) 'Authorization': 'Bearer ${apiKey ?? kForumHostApiKey}',
     };
     final resp1 = await http.post(url, headers: headers1, body: json.encode(body));
     if (resp1.statusCode >= 200 && resp1.statusCode < 300) {
@@ -46,7 +52,7 @@ class AiChatService {
     _lastError = '接口错误 ${resp1.statusCode}: ${resp1.body}';
     final headers2 = {
       'Content-Type': 'application/json',
-      if (kForumHostApiKey.isNotEmpty) 'X-API-Key': kForumHostApiKey,
+      if ((apiKey ?? kForumHostApiKey).isNotEmpty) 'X-API-Key': (apiKey ?? kForumHostApiKey),
     };
     final resp2 = await http.post(url, headers: headers2, body: json.encode(body));
     if (resp2.statusCode >= 200 && resp2.statusCode < 300) {
@@ -60,13 +66,13 @@ class AiChatService {
     final lastUser = messages.isNotEmpty ? messages.lastWhere((m) => m.role == 'user', orElse: () => AiChatMessage('user', '')) : AiChatMessage('user', '');
     final url = Uri.parse(_join(base ?? kForumHostBaseUrl, '/responses'));
     final body = {
-      'model': kForumHostModelName,
+      'model': modelName ?? kForumHostModelName,
       'input': lastUser.content,
       'temperature': 0.7,
     };
     final headers1 = {
       'Content-Type': 'application/json',
-      if (kForumHostApiKey.isNotEmpty) 'Authorization': 'Bearer $kForumHostApiKey',
+      if ((apiKey ?? kForumHostApiKey).isNotEmpty) 'Authorization': 'Bearer ${apiKey ?? kForumHostApiKey}',
     };
     final resp1 = await http.post(url, headers: headers1, body: json.encode(body));
     if (resp1.statusCode >= 200 && resp1.statusCode < 300) {
@@ -75,7 +81,7 @@ class AiChatService {
     _lastError = '接口错误 ${resp1.statusCode}: ${resp1.body}';
     final headers2 = {
       'Content-Type': 'application/json',
-      if (kForumHostApiKey.isNotEmpty) 'X-API-Key': kForumHostApiKey,
+      if ((apiKey ?? kForumHostApiKey).isNotEmpty) 'X-API-Key': (apiKey ?? kForumHostApiKey),
     };
     final resp2 = await http.post(url, headers: headers2, body: json.encode(body));
     if (resp2.statusCode >= 200 && resp2.statusCode < 300) {

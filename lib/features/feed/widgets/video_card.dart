@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:douyin_demo/common/models/video_post.dart';
 import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';

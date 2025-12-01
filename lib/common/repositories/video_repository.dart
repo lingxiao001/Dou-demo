@@ -7,8 +7,11 @@ import 'package:flutter/services.dart';
 
 class VideoRepository {
   Future<List<VideoPost>> fetchVideoPosts() async {
+    //用rootBundle读取assets/mock/videos.json文件
     final String jsonString = await rootBundle.loadString('assets/mock/videos.json');
     final List<dynamic> jsonList = json.decode(jsonString);
+
+    //把混乱的 JSON 字典封装成整洁的 VideoPost 对象 -> 返回列表。
     final posts = jsonList.map((jsonItem) {
       final authorJson = jsonItem['author'];
       return VideoPost(
