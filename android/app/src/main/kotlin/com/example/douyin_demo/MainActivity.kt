@@ -18,19 +18,9 @@ class MainActivity : FragmentActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    0 -> {
-                        // Use the cached FlutterEngine.
-                        FlutterFragment.withCachedEngine("main_engine")
-                            .build()
-                    }
+                    0 -> FlutterFragment.withCachedEngine("main_engine").build()
                     else -> {
-                        // Placeholder for Native Fragment (e.g., Profile)
-                        // For now, we can reuse FlutterFragment or create a simple native Fragment
-                        // Let's create a simple dummy Native Fragment in the next step if needed
-                        // or just reuse FlutterFragment for demo purposes but typically this would be native.
-                        // To keep it simple and compiling, let's make the second page also Flutter for now
-                        // BUT ideally this should be NativeExampleFragment()
-                         FlutterFragment.createDefault()
+                        NativeProfileFragment()
                     }
                 }
             }
