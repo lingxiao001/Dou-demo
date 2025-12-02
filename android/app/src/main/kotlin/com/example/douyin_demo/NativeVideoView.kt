@@ -133,6 +133,9 @@ class NativeVideoView(
             "isPlaying" -> {
                 result.success(player.isPlaying)
             }
+            "getBufferedPosition" -> {
+                result.success(player.bufferedPosition)
+            }
             else -> result.notImplemented()
         }
     }

@@ -46,6 +46,8 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   Duration _duration = Duration.zero;
   bool _isPlaying = false;
   Timer? _progressTimer;
+  Duration _buffered = Duration.zero;
+  bool _seeking = false;
 
   @override
   void initState() {
@@ -298,12 +300,15 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
                         _progressTimer?.cancel();
                         _progressTimer = Timer.periodic(const Duration(milliseconds: 250), (t) async {
                           if (!mounted || _nativeController == null) return;
+                          if (_seeking) return;
                           final p = await _nativeController!.getPosition();
                           final d = await _nativeController!.getDuration();
+                          final b = await _nativeController!.getBufferedPosition();
                           final playing = await _nativeController!.isPlaying();
                           setState(() {
                             _position = p;
                             _duration = d;
+                            _buffered = b;
                             _isPlaying = playing;
                           });
                           _updateRotation();
@@ -463,31 +468,33 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
               ),
               const SizedBox(height: 10),
               if (_initialized)
-                kIsWeb
-                    ? (_webController != null
-                        ? VideoProgressIndicator(
-                            _webController!,
-                            allowScrubbing: true,
-                            colors: const VideoProgressColors(
-                              playedColor: Colors.white,
-                              bufferedColor: Colors.white30,
-                              backgroundColor: Colors.white12,
-                            ),
-                          )
-                        : const SizedBox.shrink())
-                    : Slider(
-                        value: (_duration.inMilliseconds > 0)
-                            ? (_position.inMilliseconds.clamp(0, _duration.inMilliseconds) / _duration.inMilliseconds)
-                            : 0.0,
-                        onChanged: (v) async {
-                          if (_nativeController != null && _duration > Duration.zero) {
-                            final ms = (v * _duration.inMilliseconds).round();
-                            await _nativeController!.seekTo(Duration(milliseconds: ms));
-                          }
-                        },
-                        min: 0,
-                        max: 1,
-                      ),
+                _ProgressBar(
+                  fraction: (_duration.inMilliseconds > 0)
+                      ? (_position.inMilliseconds.clamp(0, _duration.inMilliseconds) / _duration.inMilliseconds)
+                      : 0.0,
+                  bufferedFraction: (_duration.inMilliseconds > 0)
+                      ? (_buffered.inMilliseconds.clamp(0, _duration.inMilliseconds) / _duration.inMilliseconds)
+                      : null,
+                  onSeek: (v) async {
+                    if (kIsWeb && _webController != null && _webController!.value.duration > Duration.zero) {
+                      final ms = (v * _webController!.value.duration.inMilliseconds).round();
+                      _seeking = true;
+                      setState(() {
+                        _position = Duration(milliseconds: ms);
+                      });
+                      await _webController!.seekTo(Duration(milliseconds: ms));
+                      _seeking = false;
+                    } else if (_nativeController != null && _duration > Duration.zero) {
+                      final ms = (v * _duration.inMilliseconds).round();
+                      _seeking = true;
+                      setState(() {
+                        _position = Duration(milliseconds: ms);
+                      });
+                      await _nativeController!.seekTo(Duration(milliseconds: ms));
+                      _seeking = false;
+                    }
+                  },
+                ),
             ],
           ),
         ),
@@ -622,5 +629,76 @@ class _ActionIcon extends StatelessWidget {
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
       ],
     );
+  }
+}
+
+class _ProgressBar extends StatefulWidget {
+  final double fraction;
+  final double? bufferedFraction;
+  final ValueChanged<double> onSeek;
+  const _ProgressBar({required this.fraction, this.bufferedFraction, required this.onSeek});
+  @override
+  State<_ProgressBar> createState() => _ProgressBarState();
+}
+
+class _ProgressBarState extends State<_ProgressBar> {
+  double? _dragFraction;
+  void _updateDrag(Offset localPos, double width) {
+    final f = (localPos.dx / width).clamp(0.0, 1.0);
+    setState(() {
+      _dragFraction = f;
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, c) {
+      final w = c.maxWidth;
+      final h = 6.0;
+      final frac = _dragFraction ?? widget.fraction;
+      final bf = widget.bufferedFraction?.clamp(0.0, 1.0);
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onPanStart: (d) => _updateDrag(d.localPosition, w),
+        onPanUpdate: (d) => _updateDrag(d.localPosition, w),
+        onPanEnd: (_) {
+          final f = (_dragFraction ?? widget.fraction).clamp(0.0, 1.0);
+          widget.onSeek(f);
+          setState(() {
+            _dragFraction = null;
+          });
+        },
+        child: SizedBox(
+          height: 16,
+          child: Stack(
+            alignment: Alignment.centerLeft,
+            children: [
+              Container(
+                height: h,
+                decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(999)),
+              ),
+              if (bf != null)
+                FractionallySizedBox(
+                  widthFactor: bf,
+                  alignment: Alignment.centerLeft,
+                  child: Container(height: h, decoration: BoxDecoration(color: Colors.white30, borderRadius: BorderRadius.circular(999))),
+                ),
+              FractionallySizedBox(
+                widthFactor: frac,
+                alignment: Alignment.centerLeft,
+                child: Container(height: h, decoration: BoxDecoration(color: Color(0xFF7C4DFF), borderRadius: BorderRadius.circular(999))),
+              ),
+              Positioned(
+                left: (w * frac).clamp(0.0, w - 1.0),
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(color: Color(0xFF7C4DFF), borderRadius: BorderRadius.circular(999), boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 2)]),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

@@ -25,6 +25,10 @@ class NativeVideoController {
     final v = await _channel.invokeMethod<bool>('isPlaying');
     return v ?? false;
   }
+  Future<Duration> getBufferedPosition() async {
+    final v = await _channel.invokeMethod<int>('getBufferedPosition');
+    return Duration(milliseconds: v ?? 0);
+  }
 }
 
 class NativeVideoView extends StatefulWidget {
