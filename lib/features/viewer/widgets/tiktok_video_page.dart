@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:douyin_demo/common/models/video_post.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
 import 'package:douyin_demo/features/viewer/widgets/comment_sheet.dart';
 import 'package:video_player/video_player.dart';
+import 'package:douyin_demo/native_video_view.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:douyin_demo/common/LLMapi/llm_api.dart';
 import 'package:douyin_demo/common/services/api_key_service.dart';
@@ -22,7 +24,9 @@ class TikTokVideoPage extends StatefulWidget {
 }
 
 class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _webController;
+  NativeVideoController? _nativeController;
+  String? _localPath;
   bool _initialized = false;
   bool _pausedByUser = false;
   bool _liked = false;
@@ -38,6 +42,10 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   Uint8List? _aiImageBytes;
   final TextEditingController _aiController = TextEditingController();
   bool _wasPlayingBeforeAi = false;
+  Duration _position = Duration.zero;
+  Duration _duration = Duration.zero;
+  bool _isPlaying = false;
+  Timer? _progressTimer;
 
   @override
   void initState() {
@@ -53,26 +61,26 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   }
 
   Future<void> _initializeController() async {
-    VideoPlayerController c;
     if (kIsWeb) {
-      c = VideoPlayerController.asset(widget.post.videoUrl);
+      final c = VideoPlayerController.asset(widget.post.videoUrl);
       await c.initialize();
       c.setLooping(true);
       _muted = true;
       c.setVolume(0.0);
+      _webController = c;
+      _initialized = true;
+      if (widget.active && !_pausedByUser) {
+        c.play();
+        _isPlaying = true;
+      }
+      _updateRotation();
+      if (mounted) setState(() {});
     } else {
       final file = await VideoAssetCacheService().getLocalFile(widget.post.videoUrl);
-      c = VideoPlayerController.file(file);
-      await c.initialize();
-      c.setLooping(true);
+      _localPath = file.path;
+      _initialized = true;
+      if (mounted) setState(() {});
     }
-    _controller = c;
-    _initialized = true;
-    if (widget.active && !_pausedByUser) {
-      _controller.play();
-    }
-    _updateRotation();
-    if (mounted) setState(() {});
   }
 
 
@@ -80,16 +88,27 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
   void didUpdateWidget(covariant TikTokVideoPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.active && _initialized && !_pausedByUser) {
-      _controller.play();
-    } else if (!widget.active && _initialized) {
-      _controller.pause();
+      if (kIsWeb) {
+        _webController?.play();
+      } else {
+        _nativeController?.play();
+      }
+      _isPlaying = true;
+    } else if (_initialized) {
+      if (kIsWeb) {
+        _webController?.pause();
+      } else {
+        _nativeController?.pause();
+      }
+      _isPlaying = false;
     }
     _updateRotation();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _webController?.dispose();
+    _progressTimer?.cancel();
     _rotationController.dispose();
     _aiController.dispose();
     super.dispose();
@@ -97,12 +116,26 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
 
   void _togglePlayPause() {
     if (!_initialized) return;
-    if (_controller.value.isPlaying) {
-      _controller.pause();
-      _pausedByUser = true;
+    if (kIsWeb) {
+      if (_webController?.value.isPlaying ?? false) {
+        _webController?.pause();
+        _pausedByUser = true;
+        _isPlaying = false;
+      } else {
+        _webController?.play();
+        _pausedByUser = false;
+        _isPlaying = true;
+      }
     } else {
-      _controller.play();
-      _pausedByUser = false;
+      if (_isPlaying) {
+        _nativeController?.pause();
+        _pausedByUser = true;
+        _isPlaying = false;
+      } else {
+        _nativeController?.play();
+        _pausedByUser = false;
+        _isPlaying = true;
+      }
     }
     setState(() {});
     _updateRotation();
@@ -138,13 +171,18 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
 
   void _toggleMute() {
     _muted = !_muted;
-    _controller.setVolume(_muted ? 0.0 : 1.0);
+    if (kIsWeb) {
+      _webController?.setVolume(_muted ? 0.0 : 1.0);
+    } else {
+      _nativeController?.setVolume(_muted ? 0.0 : 1.0);
+    }
     setState(() {});
   }
 
   void _updateRotation() {
     if (!_initialized) return;
-    if (_controller.value.isPlaying) {
+    final playing = kIsWeb ? (_webController?.value.isPlaying ?? false) : _isPlaying;
+    if (playing) {
       if (!_rotationController.isAnimating) {
         _rotationController.repeat();
       }
@@ -155,11 +193,15 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
 
   Future<void> _onAiTap() async {
     if (!_initialized) return;
-    _wasPlayingBeforeAi = _controller.value.isPlaying;
-    _controller.pause();
+    _wasPlayingBeforeAi = kIsWeb ? (_webController?.value.isPlaying ?? false) : _isPlaying;
+    if (kIsWeb) {
+      _webController?.pause();
+    } else {
+      _nativeController?.pause();
+    }
     _pausedByUser = true;
     final file = await VideoAssetCacheService().getLocalFile(widget.post.videoUrl);
-    final ms = _controller.value.position.inMilliseconds;
+    final ms = kIsWeb ? (_webController?.value.position.inMilliseconds ?? 0) : (await _nativeController?.getPosition() ?? Duration.zero).inMilliseconds;
     final bytes = await VideoThumbnail.thumbnailData(
       video: file.path,
       imageFormat: ImageFormat.JPEG,
@@ -210,7 +252,11 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
       _showAi = false;
     });
     if (_wasPlayingBeforeAi && _initialized) {
-      _controller.play();
+      if (kIsWeb) {
+        _webController?.play();
+      } else {
+        _nativeController?.play();
+      }
       _pausedByUser = false;
       _updateRotation();
     }
@@ -222,24 +268,57 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
     return Stack(
       children: [
         Positioned.fill(
-          child: _initialized
-              ? FittedBox(
-                  fit: BoxFit.contain,
-                  child: SizedBox(
-                    width: _controller.value.size.width,
-                    height: _controller.value.size.height,
-                    child: VideoPlayer(_controller),
-                  ),
-                )
-              : FutureBuilder<File?>(
-                  future: _thumbFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
-                      return Image.file(snapshot.data!, fit: BoxFit.contain);
-                    }
-                    return const ColoredBox(color: Colors.black);
-                  },
-                ),
+          child: kIsWeb
+              ? (_initialized
+                  ? FittedBox(
+                      fit: BoxFit.contain,
+                      child: SizedBox(
+                        width: _webController?.value.size.width ?? 0,
+                        height: _webController?.value.size.height ?? 0,
+                        child: _webController != null ? VideoPlayer(_webController!) : const SizedBox.shrink(),
+                      ),
+                    )
+                  : FutureBuilder<File?>(
+                      future: _thumbFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
+                          return Image.file(snapshot.data!, fit: BoxFit.contain);
+                        }
+                        return const ColoredBox(color: Colors.black);
+                      },
+                    ))
+              : (_localPath != null
+                  ? NativeVideoView(
+                      path: _localPath,
+                      autoPlay: widget.active && !_pausedByUser,
+                      looping: true,
+                      muted: _muted,
+                      onCreated: (c) async {
+                        _nativeController = c;
+                        _progressTimer?.cancel();
+                        _progressTimer = Timer.periodic(const Duration(milliseconds: 250), (t) async {
+                          if (!mounted || _nativeController == null) return;
+                          final p = await _nativeController!.getPosition();
+                          final d = await _nativeController!.getDuration();
+                          final playing = await _nativeController!.isPlaying();
+                          setState(() {
+                            _position = p;
+                            _duration = d;
+                            _isPlaying = playing;
+                          });
+                          _updateRotation();
+                        });
+                      },
+                    )
+                  : FutureBuilder<File?>(
+                      future: _thumbFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
+                          return Image.file(snapshot.data!, fit: BoxFit.contain);
+                        }
+                        return const ColoredBox(color: Colors.black);
+                      },
+                    )),
         ),
         Positioned.fill(
           child: GestureDetector(
@@ -260,7 +339,7 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
             ),
           ),
         ),
-        if (!_initialized || !_controller.value.isPlaying)
+        if (!_initialized || !(kIsWeb ? (_webController?.value.isPlaying ?? false) : _isPlaying))
           const IgnorePointer(
             ignoring: true,
             child: Center(
@@ -384,15 +463,31 @@ class _TikTokVideoPageState extends State<TikTokVideoPage> with AutomaticKeepAli
               ),
               const SizedBox(height: 10),
               if (_initialized)
-                VideoProgressIndicator(
-                  _controller,
-                  allowScrubbing: true,
-                  colors: VideoProgressColors(
-                    playedColor: Colors.white,
-                    bufferedColor: Colors.white30,
-                    backgroundColor: Colors.white12,
-                  ),
-                ),
+                kIsWeb
+                    ? (_webController != null
+                        ? VideoProgressIndicator(
+                            _webController!,
+                            allowScrubbing: true,
+                            colors: const VideoProgressColors(
+                              playedColor: Colors.white,
+                              bufferedColor: Colors.white30,
+                              backgroundColor: Colors.white12,
+                            ),
+                          )
+                        : const SizedBox.shrink())
+                    : Slider(
+                        value: (_duration.inMilliseconds > 0)
+                            ? (_position.inMilliseconds.clamp(0, _duration.inMilliseconds) / _duration.inMilliseconds)
+                            : 0.0,
+                        onChanged: (v) async {
+                          if (_nativeController != null && _duration > Duration.zero) {
+                            final ms = (v * _duration.inMilliseconds).round();
+                            await _nativeController!.seekTo(Duration(milliseconds: ms));
+                          }
+                        },
+                        min: 0,
+                        max: 1,
+                      ),
             ],
           ),
         ),
