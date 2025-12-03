@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:douyin_demo/features/feed/viewmodels/feed_grid_view_model.dart';
 import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart' show Factory;
 
 class FeedGridScreen extends ConsumerStatefulWidget {
   final ValueChanged<int>? onSwitchTab;
@@ -95,6 +97,9 @@ class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
                   'posts': nativePosts,
                 },
                 creationParamsCodec: const StandardMessageCodec(),
+                gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{
+                  Factory<VerticalDragGestureRecognizer>(VerticalDragGestureRecognizer.new),
+                },
                 onPlatformViewCreated: (id) {
                   final events = EventChannel('com.example.douyin_demo/native_feed_events_$id');
                   events.receiveBroadcastStream().listen((event) {
