@@ -30,19 +30,14 @@ class VideoCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0), // 统一圆角
+        borderRadius: BorderRadius.circular(6.0),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            spreadRadius: 1,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 2, spreadRadius: 0, offset: const Offset(0, 1)),
         ],
       ),
       // 使用 ClipRRect 裁剪点击水波纹和图片圆角
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(6.0),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -103,7 +98,7 @@ class VideoCard extends StatelessWidget {
 
                 // --- 2. 内容区域 (添加 Padding 防止贴边) ---
                 Padding(
-                  padding: const EdgeInsets.all(8.0), // 上下左右留白
+                  padding: const EdgeInsets.all(4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -120,7 +115,7 @@ class VideoCard extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 6), // 标题和作者栏的间距
+                      const SizedBox(height: 4),
 
                       // 作者与点赞行
                       Row(
@@ -132,7 +127,7 @@ class VideoCard extends StatelessWidget {
                               border: Border.all(color: Colors.grey.shade200, width: 1),
                             ),
                             child: CircleAvatar(
-                              radius: 9, // 稍微调小
+                              radius: 8,
                               backgroundColor: Colors.grey.shade200,
                               backgroundImage: NetworkImage(videoPost.author.avatarUrl),
                               onBackgroundImageError: (_, __) {},
@@ -141,7 +136,7 @@ class VideoCard extends StatelessWidget {
                                   : null,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 4),
 
                           // 作者名
                           Expanded(

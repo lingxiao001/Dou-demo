@@ -37,11 +37,11 @@ class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
           final isAndroid = Theme.of(context).platform == TargetPlatform.android;
           if (!isAndroid) {
             return LayoutBuilder(builder: (context, constraints) {
-              const padding = 10.0;
-              const crossSpacing = 10.0;
+              const padding = 4.0;
+              const crossSpacing = 4.0;
               const columns = 2;
               final tileWidth = (constraints.maxWidth - padding * 2 - crossSpacing) / columns;
-              const contentHeight = 100.0;
+              const contentHeight = 84.0;
               final tileHeight = tileWidth * (4 / 3) + contentHeight;
               final ratio = tileWidth / tileHeight;
               return GridView.builder(
