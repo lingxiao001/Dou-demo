@@ -27,5 +27,10 @@ class MainActivity : FlutterActivity() {
             "native-video",
             NativeVideoFactory(flutterEngine.dartExecutor.binaryMessenger)
         )
+
+        flutterEngine.platformViewsController.registry.registerViewFactory(
+            "native-feed-view",
+            NativeFeedFactory(flutterEngine.dartExecutor.binaryMessenger)
+        )
     }
 }
