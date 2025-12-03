@@ -64,7 +64,7 @@ class NativeVideoView(
             val item = when {
                 path != null -> MediaItem.fromUri(Uri.fromFile(java.io.File(path)))
                 url != null -> {
-                    val uri = if (url.startsWith("assets/")) Uri.parse("asset:///flutter_assets/" + url) else Uri.parse(url)
+                    val uri = if (url.startsWith("assets/")) Uri.parse("asset:///" + url) else Uri.parse(url)
                     MediaItem.fromUri(uri)
                 }
                 else -> null

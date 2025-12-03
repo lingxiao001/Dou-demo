@@ -1,9 +1,15 @@
 package com.example.douyin_demo
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
@@ -11,9 +17,17 @@ import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 
+data class FeedItem(
+    val id: String,
+    val title: String,
+    val likeCount: Int,
+    val coverPath: String?,
+    val authorNickname: String
+)
+
 class NativeFeedFactory(private val messenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
-        return NativeFeedView(context, messenger, id, args as? Map<*, *>)
+        return NativeFeedView(context, messenger, id, args)
     }
 }
 
@@ -21,56 +35,43 @@ class NativeFeedView(
     private val context: Context,
     messenger: BinaryMessenger,
     private val viewId: Int,
-    args: Map<*, *>?
+    args: Any?
 ) : PlatformView, MethodChannel.MethodCallHandler {
 
-    private val recyclerView = RecyclerView(context)
-    private val channel = MethodChannel(messenger, "com.example.douyin_demo/native_feed_$viewId")
-    private val events = EventChannel(messenger, "com.example.douyin_demo/native_feed_events_$viewId")
-    private val adapter = FeedAdapter(context)
+    private val recyclerView: RecyclerView = RecyclerView(context)
+    private val adapter = FeedAdapter { index ->
+        eventSink?.success(mapOf("type" to "onItemClick", "index" to index))
+    }
+    private val channel: MethodChannel = MethodChannel(messenger, "com.example.douyin_demo/native_feed_$viewId")
+    private val events: EventChannel = EventChannel(messenger, "com.example.douyin_demo/native_feed_events_$viewId")
     private var eventSink: EventChannel.EventSink? = null
-    private var columns = 2
-    private var autoplayPreview = true
 
     init {
+        val columns = if (args is Map<*, *>) (args["columns"] as? Int) ?: 2 else 2
+        recyclerView.layoutManager = GridLayoutManager(context, columns)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.adapter = adapter
         channel.setMethodCallHandler(this)
         events.setStreamHandler(object : EventChannel.StreamHandler {
-            override fun onListen(arguments: Any?, sink: EventChannel.EventSink) { eventSink = sink }
-            override fun onCancel(arguments: Any?) { eventSink = null }
+            override fun onListen(o: Any?, sink: EventChannel.EventSink) { eventSink = sink }
+            override fun onCancel(o: Any?) { eventSink = null }
         })
-
-        recyclerView.adapter = adapter
-        val lm = StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL)
-        recyclerView.layoutManager = lm
-        recyclerView.setHasFixedSize(true)
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
-                val first = IntArray(columns)
-                val last = IntArray(columns)
-                lm.findFirstVisibleItemPositions(first)
-                lm.findLastVisibleItemPositions(last)
-                val f = first.minOrNull() ?: 0
-                val l = last.maxOrNull() ?: 0
-                eventSink?.success(mapOf("type" to "onVisibleRange", "first" to f, "last" to l))
-            }
-        })
-
-        adapter.itemClick = { index -> eventSink?.success(mapOf("type" to "onItemClick", "index" to index)) }
-
-        if (args != null) {
-            val cols = args["columns"] as? Int
-            val autoplay = args["autoplayPreview"] as? Boolean
-            val posts = args["posts"] as? List<Map<String, Any?>>
-            if (cols != null && cols > 0) {
-                columns = cols
-                recyclerView.layoutManager = StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL)
-            }
-            if (autoplay != null) {
-                autoplayPreview = autoplay
-                adapter.autoplayPreview = autoplayPreview
-            }
+        if (args is Map<*, *>) {
+            val posts = args["posts"] as? List<*>
             if (posts != null) {
-                adapter.submitList(posts.map { toPost(it) })
+                val items = posts.mapNotNull { p ->
+                    try {
+                        val m = p as Map<*, *>
+                        FeedItem(
+                            id = (m["id"] as? String) ?: "",
+                            title = (m["title"] as? String) ?: "",
+                            likeCount = (m["likeCount"] as? Int) ?: 0,
+                            coverPath = m["coverPath"] as? String,
+                            authorNickname = (m["authorNickname"] as? String) ?: ""
+                        )
+                    } catch (_: Throwable) { null }
+                }
+                adapter.setItems(items)
             }
         }
     }
@@ -80,27 +81,24 @@ class NativeFeedView(
     override fun dispose() {
         channel.setMethodCallHandler(null)
         eventSink = null
-        recyclerView.adapter = null
     }
 
     override fun onMethodCall(call: io.flutter.plugin.common.MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "setPosts" -> {
-                val posts = call.argument<List<Map<String, Any?>>>("posts")
-                if (posts != null) adapter.submitList(posts.map { toPost(it) })
-                result.success(true)
-            }
-            "appendPosts" -> {
-                val posts = call.argument<List<Map<String, Any?>>>("posts")
+                val posts = call.argument<List<Map<String, Any>>>("posts")
                 if (posts != null) {
-                    val current = adapter.currentList.toMutableList()
-                    current.addAll(posts.map { toPost(it) })
-                    adapter.submitList(current)
+                    val items = posts.map {
+                        FeedItem(
+                            id = (it["id"] as? String) ?: "",
+                            title = (it["title"] as? String) ?: "",
+                            likeCount = (it["likeCount"] as? Int) ?: 0,
+                            coverPath = it["coverPath"] as? String,
+                            authorNickname = (it["authorNickname"] as? String) ?: ""
+                        )
+                    }
+                    adapter.setItems(items)
                 }
-                result.success(true)
-            }
-            "refresh" -> {
-                adapter.notifyDataSetChanged()
                 result.success(true)
             }
             "scrollToIndex" -> {
@@ -109,30 +107,51 @@ class NativeFeedView(
                 if (smooth) recyclerView.smoothScrollToPosition(index) else recyclerView.scrollToPosition(index)
                 result.success(true)
             }
-            "setConfig" -> {
-                val cols = call.argument<Int>("columns")
-                val autoplay = call.argument<Boolean>("autoplayPreview")
-                if (cols != null && cols > 0) {
-                    columns = cols
-                    recyclerView.layoutManager = StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL)
-                }
-                if (autoplay != null) {
-                    autoplayPreview = autoplay
-                    adapter.autoplayPreview = autoplayPreview
-                }
-                result.success(true)
-            }
             else -> result.notImplemented()
         }
     }
+}
 
-    private fun toPost(m: Map<String, Any?>): Post {
-        val id = (m["id"] as? String) ?: ""
-        val cover = (m["coverUrl"] as? String) ?: ""
-        val video = (m["videoUrl"] as? String) ?: ""
-        val title = (m["title"] as? String) ?: ""
-        return Post(id, cover, video, title)
+class FeedAdapter(private val onClick: (Int) -> Unit) : RecyclerView.Adapter<FeedVH>() {
+    private var items: List<FeedItem> = emptyList()
+    fun setItems(list: List<FeedItem>) {
+        items = list
+        notifyDataSetChanged()
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedVH {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_feed_card, parent, false)
+        return FeedVH(v)
+    }
+    override fun getItemCount(): Int = items.size
+    override fun onBindViewHolder(holder: FeedVH, position: Int) {
+        holder.bind(items[position])
+        holder.itemView.setOnClickListener { onClick(position) }
     }
 }
 
-data class Post(val id: String, val coverUrl: String, val videoUrl: String, val title: String)
+class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
+    private val cover: ImageView = v.findViewById(R.id.cover)
+    private val title: TextView = v.findViewById(R.id.title)
+    private val author: TextView = v.findViewById(R.id.author)
+    private val likes: TextView = v.findViewById(R.id.likes)
+    fun bind(item: FeedItem) {
+        title.text = item.title
+        author.text = item.authorNickname
+        likes.text = formatLikes(item.likeCount)
+        cover.setImageDrawable(null)
+        val path = item.coverPath
+        if (path != null && path.isNotEmpty()) {
+            Thread {
+                try {
+                    val p = if (path.startsWith("file://")) Uri.parse(path).path ?: path else path
+                    val bmp = BitmapFactory.decodeFile(p)
+                    cover.post { cover.setImageBitmap(bmp) }
+                } catch (_: Throwable) {}
+            }.start()
+        }
+    }
+    private fun formatLikes(count: Int): String {
+        return if (count >= 10000) String.format("%.1f万", count / 10000.0) else count.toString()
+    }
+}
+
