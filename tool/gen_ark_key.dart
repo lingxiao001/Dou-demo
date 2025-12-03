@@ -14,5 +14,7 @@ void main() {
   final out = File('lib/common/LLMapi/key_injected.dart');
   out.writeAsStringSync("const String kInjectedArkApiKey = '$v';\n");
   stdout.writeln('已生成 lib/common/LLMapi/key_injected.dart');
+  final asset = File('assets/ark.key');
+  asset.writeAsStringSync(v + '\n');
+  stdout.writeln('已写入 assets/ark.key');
 }
-

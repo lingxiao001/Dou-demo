@@ -81,4 +81,62 @@ class LLMapi {
     final b = base.endsWith('/') ? base.substring(0, base.length - 1) : base;
     return '$b$path';
   }
+
+  Future<String> chatText(List<Map<String, String>> messages) async {
+    final url = Uri.parse(_join(base, '/chat/completions'));
+    final body = {
+      'model': model,
+      'messages': messages.map((m) => {
+            'role': m['role'],
+            'content': [
+              {
+                'type': 'text',
+                'text': m['content'] ?? ''
+              }
+            ]
+          }).toList(),
+    };
+    final env = const String.fromEnvironment('ARK_API_KEY', defaultValue: '');
+    String key = '';
+    if (kInjectedArkApiKey.isNotEmpty) {
+      key = kInjectedArkApiKey;
+    } else if ((apiKey ?? '').isNotEmpty) {
+      key = apiKey!;
+    } else if (env.isNotEmpty) {
+      key = env;
+    } else {
+      key = await ApiKeyService().loadArkKey() ?? '';
+    }
+    final headers1 = {
+      'Content-Type': 'application/json',
+      if (key.isNotEmpty) 'Authorization': 'Bearer $key',
+    };
+    final resp = await http.post(url, headers: headers1, body: json.encode(body));
+    if (resp.statusCode >= 200 && resp.statusCode < 300) {
+      final data = json.decode(resp.body);
+      final choices = data['choices'];
+      if (choices is List && choices.isNotEmpty) {
+        final msg = choices[0]['message'];
+        final c = msg['content'];
+        if (c is String) return c;
+      }
+      throw StateError('响应解析失败');
+    }
+    final headers2 = {
+      'Content-Type': 'application/json',
+      if (key.isNotEmpty) 'X-API-Key': key,
+    };
+    final resp2 = await http.post(url, headers: headers2, body: json.encode(body));
+    if (resp2.statusCode >= 200 && resp2.statusCode < 300) {
+      final data = json.decode(resp2.body);
+      final choices = data['choices'];
+      if (choices is List && choices.isNotEmpty) {
+        final msg = choices[0]['message'];
+        final c = msg['content'];
+        if (c is String) return c;
+      }
+      throw StateError('响应解析失败');
+    }
+    throw HttpException('接口错误 ${resp2.statusCode}: ${resp2.body}');
+  }
 }

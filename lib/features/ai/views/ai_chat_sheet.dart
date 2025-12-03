@@ -1,4 +1,5 @@
 import 'package:douyin_demo/common/services/ai_chat_service.dart';
+import 'package:douyin_demo/common/LLMapi/llm_api.dart';
 import 'package:flutter/material.dart';
 
 class AiChatSheet extends StatefulWidget {
@@ -26,12 +27,20 @@ class _AiChatSheetState extends State<AiChatSheet> {
       _loading = true;
       _controller.clear();
     });
-    final reply = await AiChatService().send(_messages);
-    if (!mounted) return;
-    setState(() {
-      _messages.add(AiChatMessage('assistant', reply));
-      _loading = false;
-    });
+    try {
+      final reply = await LLMapi().chatText(_messages.map((m) => {'role': m.role, 'content': m.content}).toList());
+      if (!mounted) return;
+      setState(() {
+        _messages.add(AiChatMessage('assistant', reply));
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _messages.add(AiChatMessage('assistant', '$e'));
+        _loading = false;
+      });
+    }
   }
 
   @override

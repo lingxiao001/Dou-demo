@@ -46,3 +46,4 @@ app.*.map.json
 
 # Local secrets
 .ark.key
+assets/ark.key

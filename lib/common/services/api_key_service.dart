@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'ark_asset_loader_stub.dart' if (dart.library.ui) 'ark_asset_loader_flutter.dart';
 
 class ApiKeyService {
   Future<String?> loadArkKey() async {
@@ -20,6 +21,17 @@ class ApiKeyService {
         final v = (await f2.readAsString()).trim();
         if (v.isNotEmpty) return v;
       }
+    } catch (_) {}
+    try {
+      final f3 = File('d\\douyin_demo\\.ark.key');
+      if (await f3.exists()) {
+        final v = (await f3.readAsString()).trim();
+        if (v.isNotEmpty) return v;
+      }
+    } catch (_) {}
+    try {
+      final v = (await loadArkKeyFromAssets())?.trim();
+      if (v != null && v.isNotEmpty) return v;
     } catch (_) {}
     return null;
   }
