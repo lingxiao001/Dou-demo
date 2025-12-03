@@ -1,8 +1,12 @@
 package com.example.douyin_demo
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.LruCache
+import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
 import android.view.View
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -50,6 +54,8 @@ class NativeFeedView(
         val columns = if (args is Map<*, *>) (args["columns"] as? Int) ?: 2 else 2
         recyclerView.layoutManager = GridLayoutManager(context, columns)
         recyclerView.setHasFixedSize(true)
+        recyclerView.itemAnimator = null
+        recyclerView.setItemViewCacheSize(16)
         recyclerView.adapter = adapter
         channel.setMethodCallHandler(this)
         events.setStreamHandler(object : EventChannel.StreamHandler {
@@ -134,6 +140,12 @@ class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
     private val title: TextView = v.findViewById(R.id.title)
     private val author: TextView = v.findViewById(R.id.author)
     private val likes: TextView = v.findViewById(R.id.likes)
+    companion object {
+        private val cache: LruCache<String, Bitmap> = object : LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 1024 / 8).toInt()) {
+            override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount / 1024
+        }
+        private val executor: ExecutorService = Executors.newFixedThreadPool(2)
+    }
     fun bind(item: FeedItem) {
         title.text = item.title
         author.text = item.authorNickname
@@ -141,17 +153,37 @@ class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
         cover.setImageDrawable(null)
         val path = item.coverPath
         if (path != null && path.isNotEmpty()) {
-            Thread {
-                try {
-                    val p = if (path.startsWith("file://")) Uri.parse(path).path ?: path else path
-                    val bmp = BitmapFactory.decodeFile(p)
-                    cover.post { cover.setImageBitmap(bmp) }
-                } catch (_: Throwable) {}
-            }.start()
+            val p = if (path.startsWith("file://")) Uri.parse(path).path ?: path else path
+            val cached = cache.get(p)
+            if (cached != null) {
+                cover.setImageBitmap(cached)
+            } else {
+                executor.execute {
+                    try {
+                        val o1 = BitmapFactory.Options()
+                        o1.inJustDecodeBounds = true
+                        BitmapFactory.decodeFile(p, o1)
+                        var sample = 1
+                        val targetW = 512
+                        var w = o1.outWidth
+                        var h = o1.outHeight
+                        while (w / 2 >= targetW && h / 2 >= targetW * 4 / 3) {
+                            w /= 2; h /= 2; sample *= 2
+                        }
+                        val o2 = BitmapFactory.Options()
+                        o2.inSampleSize = sample
+                        o2.inPreferredConfig = Bitmap.Config.RGB_565
+                        val bmp = BitmapFactory.decodeFile(p, o2)
+                        if (bmp != null) {
+                            cache.put(p, bmp)
+                            cover.post { cover.setImageBitmap(bmp) }
+                        }
+                    } catch (_: Throwable) {}
+                }
+            }
         }
     }
     private fun formatLikes(count: Int): String {
         return if (count >= 10000) String.format("%.1f万", count / 10000.0) else count.toString()
     }
 }
-

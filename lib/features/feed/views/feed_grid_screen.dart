@@ -15,6 +15,8 @@ class FeedGridScreen extends ConsumerStatefulWidget {
 }
 
 class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
+  Future<List<Map<String, dynamic>>>? _nativePostsFuture;
+  String _postsKey = '';
 
   @override
   void initState() {
@@ -74,8 +76,13 @@ class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
               );
             });
           }
+          final key = posts.map((p) => p.id).join(',');
+          if (_nativePostsFuture == null || _postsKey != key) {
+            _postsKey = key;
+            _nativePostsFuture = _buildNativePosts(posts);
+          }
           return FutureBuilder<List<Map<String, dynamic>>>(
-            future: _buildNativePosts(posts),
+            future: _nativePostsFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
                 return const Center(child: CircularProgressIndicator());
