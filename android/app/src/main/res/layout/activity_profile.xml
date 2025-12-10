@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@android:color/white"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="我"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_settings"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/top_bar">
+
+        <FrameLayout
+            android:layout_width="68dp"
+            android:layout_height="68dp">
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+            <ImageView
+                android:id="@+id/iv_add"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="bottom|end" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp">
+            <TextView
+                android:id="@+id/nickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                android:text="linging" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="6" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" 获赞" />
+                <TextView android:layout_width="16dp" android:layout_height="wrap_content" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" 关注" />
+                <TextView android:layout_width="16dp" android:layout_height="wrap_content" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" 粉丝" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="编辑主页"
+            android:minWidth="0dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tag_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="( ु•͈ᴗ•͈)ु  添加标签更懂你"
+        android:textColor="#666666"
+        android:padding="10dp"
+        android:layout_marginHorizontal="16dp"
+        android:background="#F5F5F7"
+        app:layout_constraintTop_toBottomOf="@id/header" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tag_hint" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

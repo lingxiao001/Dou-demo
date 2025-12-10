@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:douyin_demo/common/providers/app_providers.dart';
 import 'package:douyin_demo/common/services/video_asset_cache_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:douyin_demo/features/profile/views/profile_screen.dart' as douyin_profile;
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -46,9 +45,6 @@ class _MyAppState extends ConsumerState<MyApp> {
       ),
       onGenerateRoute: (settings) {
         final name = settings.name ?? '';
-        if (name == 'profile') {
-          return MaterialPageRoute(builder: (_) => const douyin_profile.ProfileScreen());
-        }
         if (name.startsWith('viewer/')) {
           final parts = name.split('/');
           final idx = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;

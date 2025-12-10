@@ -32,9 +32,5 @@ class MainActivity : FlutterActivity() {//主活动类，用于启动 Flutter �
             "native-feed-view",
             NativeFeedFactory(flutterEngine.dartExecutor.binaryMessenger)
         )
-
-        if (intent?.getBooleanExtra("openProfile", false) == true) {
-            flutterEngine.navigationChannel.pushRoute("profile")
-        }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.douyin_demo
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -43,10 +45,8 @@ class NativeHomeActivity : AppCompatActivity() {
     })
     viewPager.setCurrentItem(1, false)
 
-    findViewById<android.widget.TextView>(R.id.tv_profile).setOnClickListener {
-      val intent = android.content.Intent(this, MainActivity::class.java)
-      intent.putExtra("openProfile", true)
-      startActivity(intent)
+    findViewById<TextView>(R.id.nav_me)?.setOnClickListener {
+      startActivity(Intent(this, ProfileActivity::class.java))
     }
   }
 }
