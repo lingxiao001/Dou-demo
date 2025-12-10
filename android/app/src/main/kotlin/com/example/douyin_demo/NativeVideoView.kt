@@ -17,24 +17,25 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 
+//实现 PlatformViewFactory 接口，用于创建 NativeVideoView 实例。
 class NativeVideoFactory(private val messenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
         return NativeVideoView(context, messenger, id, args)
     }
 }
-
+//实现 PlatformView 接口，用于管理视频播放。
 class NativeVideoView(
     private val context: Context,
-    messenger: BinaryMessenger,
+    messenger: BinaryMessenger,//用于与 Dart 端通信
     private val viewId: Int,
     args: Any?
-) : PlatformView, MethodChannel.MethodCallHandler {
+) : PlatformView, MethodChannel.MethodCallHandler {//实现 MethodChannel.MethodCallHandler 接口，用于处理 Dart 端的方法调用。
 
     private val playerView: PlayerView = LayoutInflater.from(context)
         .inflate(R.layout.native_video_view, null, false) as PlayerView
     private val player: ExoPlayer
     private val channel: MethodChannel
-
+    //创建 ExoPlayer 实例，配置视频播放参数。
     init {
         playerView.useController = false
         val trackSelector = DefaultTrackSelector(context)
@@ -51,7 +52,7 @@ class NativeVideoView(
 
         channel = MethodChannel(messenger, "com.example.douyin_demo/native_video_$viewId")
         channel.setMethodCallHandler(this)
-
+//解析 Dart 端传递的参数，如视频 URL、自动播放、循环播放、静音等。
         if (args is Map<*, *>) {
             val url = args["url"] as? String
             val path = args["path"] as? String
@@ -85,7 +86,7 @@ class NativeVideoView(
         playerView.player = null
         player.release()
     }
-
+//处理 Dart 端的方法调用，如 play、pause、setVolume 等。
     override fun onMethodCall(call: io.flutter.plugin.common.MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "play" -> {

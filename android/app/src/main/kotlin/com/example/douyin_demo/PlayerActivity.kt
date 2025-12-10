@@ -24,6 +24,7 @@ class PlayerActivity : Activity() {
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(15000, 50000, 2500, 3000)
             .build()
+        //默认的 ExoPlayer 配置可能比较保守，这里加大了缓冲区（Min 15s, Max 50s）
         player = ExoPlayer.Builder(this)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
@@ -39,17 +40,18 @@ class PlayerActivity : Activity() {
         player.prepare()
         player.playWhenReady = true
     }
-
+    
+//当用户切后台或锁屏时，暂停播放 (playWhenReady = false)，防止后台偷跑流量或声音干扰。
     override fun onPause() {
         super.onPause()
         player.playWhenReady = false
     }
-
+//回到页面时自动恢复播放。
     override fun onResume() {
         super.onResume()
         player.playWhenReady = true
     }
-
+//视频解码器是硬件资源，如果不调用 release()，会导致内存泄漏，甚至导致其他 App 无法播放视频。
     override fun onDestroy() {
         playerView.player = null
         player.release()
