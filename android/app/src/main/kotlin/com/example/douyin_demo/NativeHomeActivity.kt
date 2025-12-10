@@ -42,6 +42,11 @@ class NativeHomeActivity : AppCompatActivity() {
       override fun onPageSelected(position: Int) { if (tabLayout.selectedTabPosition != position) tabLayout.getTabAt(position)?.select() }
     })
     viewPager.setCurrentItem(1, false)
+
+    findViewById<android.widget.TextView>(R.id.tv_profile).setOnClickListener {
+      val intent = android.content.Intent(this, MainActivity::class.java)
+      intent.putExtra("openProfile", true)
+      startActivity(intent)
+    }
   }
 }
-
