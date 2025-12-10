@@ -1,4 +1,9 @@
 package com.example.douyin_demo
+//混合开发模块
+//封装给 Flutter 用
+
+
+
 
 import android.content.Context
 import android.net.Uri
@@ -17,13 +22,16 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 
-//实现 PlatformViewFactory 接口，用于创建 NativeVideoView 实例。
+//实现 PlatformViewFactory 接口，当 Flutter需要显示该部分 ，就会调用工厂单独create方法
 class NativeVideoFactory(private val messenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
         return NativeVideoView(context, messenger, id, args)
     }
 }
-//实现 PlatformView 接口，用于管理视频播放。
+
+
+
+//实现 PlatformView 接口，意味着本身就是一个View
 class NativeVideoView(
     private val context: Context,
     messenger: BinaryMessenger,//用于与 Dart 端通信
@@ -35,6 +43,7 @@ class NativeVideoView(
         .inflate(R.layout.native_video_view, null, false) as PlayerView
     private val player: ExoPlayer
     private val channel: MethodChannel
+
     //创建 ExoPlayer 实例，配置视频播放参数。
     init {
         playerView.useController = false

@@ -37,12 +37,7 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize"/>
-        <activity
-            android:name=".PlayerActivity"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/NormalTheme"/>
+
         <activity
             android:name=".ProfileActivity"
             android:exported="false"

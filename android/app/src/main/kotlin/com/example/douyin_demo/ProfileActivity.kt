@@ -42,6 +42,7 @@ class ProfileActivity : AppCompatActivity() {
       input.text = nicknameV.text
       val et = android.widget.EditText(this)
       et.setText(nicknameV.text)
+
       AlertDialog.Builder(this)
         .setTitle("编辑昵称")
         .setView(et)
@@ -56,10 +57,12 @@ class ProfileActivity : AppCompatActivity() {
         .show()
     }
 
+
     val tabs = findViewById<TabLayout>(R.id.tab_layout)
     val pager = findViewById<ViewPager2>(R.id.view_pager)
     pager.adapter = object : FragmentStateAdapter(this) {
       override fun getItemCount(): Int = 3
+
       override fun createFragment(position: Int): androidx.fragment.app.Fragment {
         return GridPlaceholderFragment()
       }
@@ -70,6 +73,7 @@ class ProfileActivity : AppCompatActivity() {
   }
 }
 
+//模拟九宫格网格列表
 class GridPlaceholderFragment : androidx.fragment.app.Fragment() {
   override fun onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup?, savedInstanceState: Bundle?): android.view.View? {
     val rv = RecyclerView(requireContext())
