@@ -17,7 +17,8 @@ import io.flutter.plugin.platform.PlatformViewFactory
 import coil.load
 import coil.size.ViewSizeResolver
 
-//表示抖音视频列表中的一项，包含视频 ID、标题、点赞数、封面路径和作者昵称。
+//这个文件写ViewHolder & 适配器
+
 data class FeedItem(
     val id: String,
     val title: String,
@@ -25,6 +26,9 @@ data class FeedItem(
     val coverPath: String?,
     val authorNickname: String
 )
+
+
+/*
 //实现 PlatformViewFactory 接口，用于创建 NativeFeedView 实例。
 class NativeFeedFactory(private val messenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
@@ -114,27 +118,35 @@ class NativeFeedView(
         }
     }
 }
-//实现 RecyclerView.Adapter 接口，把抖音视频列表中的每一项绑定到 FeedVH 实例上。
+*/
+
+
+
+
+// RecyclerView.Adapter 接口
 class FeedAdapter(private val onClick: (Int) -> Unit) : RecyclerView.Adapter<FeedVH>() {
     private var items: List<FeedItem> = emptyList()
     fun setItems(list: List<FeedItem>) {
-        items = list
-        notifyDataSetChanged()
+        items = list //存入
+        notifyDataSetChanged() //刷新
     }
-    //创建 FeedVH 实例，用于绑定抖音视频列表中的每一项。
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedVH {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_feed_card, parent, false)
         return FeedVH(v)
     }
+
     override fun getItemCount(): Int = items.size
-    //绑定 FeedItem 实例到 FeedVH 实例上，更新布局中的 TextView 和 ImageView。
+
+
     override fun onBindViewHolder(holder: FeedVH, position: Int) {
         holder.bind(items[position])
-        holder.itemView.setOnClickListener { onClick(position) }
+        holder.itemView.setOnClickListener { onClick(position) } //设置为点击传出被点击视频编号
     }
 }
-//核心类--表示抖音视频列表中的一个小卡片，包含视频 ID、标题、点赞数、封面路径和作者昵称。
-//在创建时，把 FeedItem 实例中的数据绑定到布局中的 TextView 和 ImageView 上。
+
+
 class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
     //绑定xml布局里的控件
     private val cover: ImageView = v.findViewById(R.id.cover)//封面图片
@@ -149,8 +161,8 @@ class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
         val path = item.coverPath ?: ""
         if (path.isNotEmpty()) {
             cover.load(path) {
-                crossfade(true)
-                size(ViewSizeResolver(cover))
+                crossfade(true) //淡入淡出
+                size(ViewSizeResolver(cover))//降采样（按需加载尺寸）
             }
         } else {
             cover.setImageDrawable(null)

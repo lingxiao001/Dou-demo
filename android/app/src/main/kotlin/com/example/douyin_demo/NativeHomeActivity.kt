@@ -16,10 +16,12 @@ class NativeHomeActivity : AppCompatActivity() {
     // 初始化 ViewPager2 和 TabLayout
     val viewPager = findViewById<ViewPager2>(R.id.view_pager)
     val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
+
+
     // 设置 ViewPager2 的 Adapter
     val adapter = object : FragmentStateAdapter(this) {
       override fun getItemCount(): Int = 4
-
+        //这里4个页面用的都是 NativeFeedFragment
       override fun createFragment(position: Int): androidx.fragment.app.Fragment {
         val f = NativeFeedFragment()
         f.arguments = Bundle().apply { putInt("category", position) }
@@ -31,10 +33,15 @@ class NativeHomeActivity : AppCompatActivity() {
     viewPager.isUserInputEnabled = true
 
     val titles = listOf("关注", "精选", "商城", "推荐")
+
+
+
     // 关联 TabLayout 和 ViewPager2
     TabLayoutMediator(tabLayout, viewPager) { tab, position ->
       tab.text = titles[position]
     }.attach()
+
+      //这里保险地写了双向监听 确保翻页和tab导航标签同步
     tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
       override fun onTabSelected(tab: TabLayout.Tab) { viewPager.currentItem = tab.position }
       override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -43,8 +50,11 @@ class NativeHomeActivity : AppCompatActivity() {
     viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
       override fun onPageSelected(position: Int) { if (tabLayout.selectedTabPosition != position) tabLayout.getTabAt(position)?.select() }
     })
+
+      //默认初始跳到第一页-‘精选’
     viewPager.setCurrentItem(1, false)
 
+      //可点击下导航栏按钮进入 ‘我的’界面
     findViewById<TextView>(R.id.nav_me)?.setOnClickListener {
       startActivity(Intent(this, ProfileActivity::class.java))
     }

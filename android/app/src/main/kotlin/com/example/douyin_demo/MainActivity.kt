@@ -22,15 +22,17 @@ class MainActivity : FlutterActivity() {//主活动类，用于启动 Flutter �
                     else -> result.notImplemented()
                 }
             }
+
+            
         //在这里注册platform view工厂
         flutterEngine.platformViewsController.registry.registerViewFactory(
             "native-video",
             NativeVideoFactory(flutterEngine.dartExecutor.binaryMessenger)
         )
 
-        flutterEngine.platformViewsController.registry.registerViewFactory(
-            "native-feed-view",
-            NativeFeedFactory(flutterEngine.dartExecutor.binaryMessenger)
-        )
+//        flutterEngine.platformViewsController.registry.registerViewFactory(
+//            "native-feed-view",
+//            NativeFeedFactory(flutterEngine.dartExecutor.binaryMessenger)
+//        )
     }
 }
