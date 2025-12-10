@@ -1,8 +1,6 @@
 package com.example.douyin_demo
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.media.MediaMetadataRetriever
+ 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import org.json.JSONArray
 import java.io.File
-import java.io.FileOutputStream
+ 
 
 class NativeFeedFragment : Fragment() {
   private var items: List<FeedItem> = emptyList()
@@ -20,7 +18,7 @@ class NativeFeedFragment : Fragment() {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.fragment_feed, container, false)
   }
-
+  // 初始化 RecyclerView
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     val rv = view.findViewById<RecyclerView>(R.id.recycler_view)
@@ -41,7 +39,7 @@ class NativeFeedFragment : Fragment() {
       .build(requireContext())
     startActivity(intent)
   }
-
+  // 加载视频数据
   private fun loadFeedItems(): List<FeedItem> {
     val bridgeFile = File(requireContext().filesDir, "native_bridge/feed_posts.json")
     if (bridgeFile.exists()) {
@@ -83,48 +81,12 @@ class NativeFeedFragment : Fragment() {
       val likeCount = o.optInt("likeCount")
       val videoUrl = o.optString("videoUrl")
       val authorNickname = author.optString("nickname")
-      val coverPath = ensureThumbnail(videoUrl)
+      val name = File(videoUrl).nameWithoutExtension + ".jpg"
+      val coverPath = "file:///android_asset/flutter_assets/assets/covers/$name"
       out.add(FeedItem(id = id, title = title, likeCount = likeCount, coverPath = coverPath, authorNickname = authorNickname))
     }
     return out
   }
 
-  private fun ensureThumbnail(videoAssetPath: String?): String {
-    if (videoAssetPath.isNullOrEmpty()) return ""
-    val name = File(videoAssetPath).nameWithoutExtension + ".jpg"
-    val dir = File(requireContext().filesDir, "thumbnail_cache")
-    if (!dir.exists()) dir.mkdirs()
-    val dst = File(dir, name)
-    if (dst.exists()) return dst.absolutePath
-
-    val am = requireContext().assets
-    val input = am.open("flutter_assets/$videoAssetPath")
-    val tmp = File(requireContext().cacheDir, File(videoAssetPath).name)
-    FileOutputStream(tmp).use { fos ->
-      input.copyTo(fos)
-    }
-    val retriever = MediaMetadataRetriever()
-    try {
-      retriever.setDataSource(tmp.absolutePath)
-      val bmp = retriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST)
-      if (bmp != null) {
-        val scaled = downsample(bmp, 512)
-        dst.outputStream().use { os -> scaled.compress(Bitmap.CompressFormat.JPEG, 80, os) }
-      }
-    } catch (_: Throwable) {
-    } finally {
-      retriever.release()
-      tmp.delete()
-    }
-    return dst.absolutePath
-  }
-
-  private fun downsample(b: Bitmap, targetW: Int): Bitmap {
-    val w = b.width
-    val h = b.height
-    if (w <= targetW) return b
-    val ratio = targetW.toFloat() / w
-    val nh = (h * ratio).toInt()
-    return Bitmap.createScaledBitmap(b, targetW, nh, true)
-  }
+  
 }

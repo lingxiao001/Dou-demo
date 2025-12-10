@@ -1,0 +1,30 @@
+<variant
+    name="debug"
+    package="com.example.douyin_try_native"
+    minSdkVersion="28"
+    targetSdkVersion="36.0"
+    debuggable="true"
+    mergedManifest="build_alt\intermediates\merged_manifest\debug\processDebugMainManifest\AndroidManifest.xml"
+    partialResultsDir="build_alt\intermediates\android_test_lint_partial_results\debug\lintAnalyzeDebugAndroidTest\out"
+    desugaredMethodsFiles="C:\Users\18319\.gradle\caches\8.13\transforms\b308e4fad164899c4b8795360b3ff254\transformed\D8BackportedDesugaredMethods.txt">
+  <buildFeatures
+      namespacing="REQUIRED"/>
+  <sourceProviders>
+  </sourceProviders>
+  <testSourceProviders>
+    <sourceProvider
+        manifests="src\androidTest\AndroidManifest.xml"
+        javaDirectories="src\androidTest\java;src\androidTestDebug\java;src\androidTest\kotlin;src\androidTestDebug\kotlin"
+        resDirectories="src\androidTest\res;src\androidTestDebug\res"
+        assetsDirectories="src\androidTest\assets;src\androidTestDebug\assets"
+        androidTest="true"/>
+  </testSourceProviders>
+  <testFixturesSourceProviders>
+  </testFixturesSourceProviders>
+  <artifact
+      type="INSTRUMENTATION_TEST"
+      applicationId="com.example.douyin_try_native.test"
+      generatedResourceFolders="build_alt\generated\res\resValues\androidTest\debug"
+      desugaredMethodsFiles="C:\Users\18319\.gradle\caches\8.13\transforms\b308e4fad164899c4b8795360b3ff254\transformed\D8BackportedDesugaredMethods.txt">
+  </artifact>
+</variant>

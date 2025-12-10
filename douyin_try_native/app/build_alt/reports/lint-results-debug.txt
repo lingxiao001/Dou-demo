@@ -1,0 +1,278 @@
+D:\douyin_try_native\app\build.gradle.kts:52: Warning: A newer version of com.google.android.material:material than 1.9.0 is available: 1.13.0 [GradleDependency]
+    implementation("com.google.android.material:material:1.9.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\build.gradle.kts:53: Warning: A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.1 [GradleDependency]
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\build.gradle.kts:56: Warning: A newer version of androidx.fragment:fragment-ktx than 1.7.1 is available: 1.8.9 [GradleDependency]
+    implementation("androidx.fragment:fragment-ktx:1.7.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\gradle\libs.versions.toml:10: Warning: A newer version of androidx.activity:activity than 1.12.0 is available: 1.12.1 [GradleDependency]
+activity = "1.12.0"
+           ~~~~~~~~
+D:\douyin_try_native\gradle\libs.versions.toml:11: Warning: A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.1 [GradleDependency]
+constraintlayout = "2.1.4"
+                   ~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+D:\douyin_try_native\app\build.gradle.kts:54: Warning: A newer version of io.coil-kt:coil than 2.6.0 is available: 2.7.0 [NewerVersionAvailable]
+    implementation("io.coil-kt:coil:2.6.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\gradle\libs.versions.toml:3: Warning: A newer version of org.jetbrains.kotlin.android than 2.0.21 is available: 2.2.21 [NewerVersionAvailable]
+kotlin = "2.0.21"
+         ~~~~~~~~
+
+   Explanation for issues of type "NewerVersionAvailable":
+   This detector checks with a central repository to see if there are newer
+   versions available for the dependencies used by this project. This is
+   similar to the GradleDependency check, which checks for newer versions
+   available in the Android SDK tools and libraries, but this works with any
+   MavenCentral dependency, and connects to the library every time, which
+   makes it more flexible but also much slower.
+
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:84: Warning: Use app:drawableTopCompat instead of android:drawableTop [UseCompatTextViewDrawableXml from androidx.appcompat]
+            android:drawableTop="@drawable/ic_home"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:95: Warning: Use app:drawableTopCompat instead of android:drawableTop [UseCompatTextViewDrawableXml from androidx.appcompat]
+            android:drawableTop="@drawable/ic_friends"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:118: Warning: Use app:drawableTopCompat instead of android:drawableTop [UseCompatTextViewDrawableXml from androidx.appcompat]
+            android:drawableTop="@drawable/ic_message"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:128: Warning: Use app:drawableTopCompat instead of android:drawableTop [UseCompatTextViewDrawableXml from androidx.appcompat]
+            android:drawableTop="@drawable/ic_me"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseCompatTextViewDrawableXml":
+   TextView uses android: compound drawable attributes instead of app: ones
+
+   Vendor: Android Open Source Project
+   Identifier: androidx.appcompat
+   Feedback: https://issuetracker.google.com/issues/new?component=460343
+
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:9: Warning: Possible overdraw: Root element paints background #F5F5F5 with a theme that also paints a background (inferred theme is @style/Theme.Douyin_try_native) [Overdraw]
+    android:background="#F5F5F5"> <!-- 浅灰色背景 -->
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "Overdraw":
+   If you set a background drawable on a root view, then you should use a
+   custom theme where the theme background is null. Otherwise, the theme
+   background will be painted first, only to have your custom background
+   completely cover it; this is called "overdraw".
+
+   NOTE: This detector relies on figuring out which layouts are associated
+   with which activities based on scanning the Java code, and it's currently
+   doing that using an inexact pattern matching algorithm. Therefore, it can
+   incorrectly conclude which activity the layout is associated with and then
+   wrongly complain that a background-theme is hidden.
+
+   If you want your custom background on multiple pages, then you should
+   consider making a custom theme with your custom background and just using
+   that theme instead of a root element background.
+
+   Of course it's possible that your custom drawable is translucent and you
+   want it to be mixed with the background. However, you will get better
+   performance if you pre-mix the background with your drawable and use that
+   resulting image or color as a custom theme background instead.
+
+D:\douyin_try_native\app\src\main\res\values\colors.xml:3: Warning: The resource R.color.black appears to be unused [UnusedResources]
+    <color name="black">#FF000000</color>
+           ~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\values\colors.xml:4: Warning: The resource R.color.white appears to be unused [UnusedResources]
+    <color name="white">#FFFFFFFF</color>
+           ~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+   Available options:
+
+   **skip-libraries** (default is true):
+   Whether the unused resource check should skip reporting unused resources in libraries.
+
+   Many libraries will declare resources that are part of the library surface; other modules depending on the library will also reference the resources. To avoid reporting all these resources as unused (in the context of a library), the unused resource check normally skips reporting unused resources in libraries. Instead, run the unused resource check on the consuming app module (along with `checkDependencies=true`).
+
+   However, there are cases where you want to check that all the resources declared in a library are used; in that case, you can disable the skip option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UnusedResources">
+           <option name="skip-libraries" value="true" />
+       </issue>
+   </lint>
+   ```
+
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_1.png: Warning: Found bitmap drawable res/drawable/img_cover_1.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_2.png: Warning: Found bitmap drawable res/drawable/img_cover_2.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_3.png: Warning: Found bitmap drawable res/drawable/img_cover_3.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_4.png: Warning: Found bitmap drawable res/drawable/img_cover_4.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_5.png: Warning: Found bitmap drawable res/drawable/img_cover_5.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_6.png: Warning: Found bitmap drawable res/drawable/img_cover_6.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_7.png: Warning: Found bitmap drawable res/drawable/img_cover_7.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_8.png: Warning: Found bitmap drawable res/drawable/img_cover_8.png in densityless folder [IconLocation]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_9.png: Warning: Found bitmap drawable res/drawable/img_cover_9.png in densityless folder [IconLocation]
+
+   Explanation for issues of type "IconLocation":
+   The res/drawable folder is intended for density-independent graphics such
+   as shapes defined in XML. For bitmaps, move it to drawable-mdpi and
+   consider providing higher and lower resolution versions in drawable-ldpi,
+   drawable-hdpi and drawable-xhdpi. If the icon really is density independent
+   (for example a solid color) you can place it in drawable-nodpi.
+
+   https://developer.android.com/guide/practices/screens_support.html
+
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_1.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_2.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_3.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_4.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_5.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_6.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_7.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_8.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+D:\douyin_try_native\app\src\main\res\drawable\img_cover_9.png: Warning: Misleading file extension; named .png but the file format is JPEG [IconExtension]
+
+   Explanation for issues of type "IconExtension":
+   Ensures that icons have the correct file extension (e.g. a .png file is
+   really in the PNG format and not for example a GIF file named .png).
+
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:88: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp" />
+            ~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:98: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp" />
+            ~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:121: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp" />
+            ~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:131: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp" />
+            ~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SmallSp":
+   Avoid using sizes smaller than 11sp.
+
+D:\douyin_try_native\app\build.gradle.kts:52: Warning: Use version catalog instead (com.google.android.material:material is already available as material, but using version 1.13.0 instead) [UseTomlInstead]
+    implementation("com.google.android.material:material:1.9.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\build.gradle.kts:53: Warning: Use the existing version catalog reference (libs.androidx.constraintlayout) instead [UseTomlInstead]
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\build.gradle.kts:54: Warning: Use version catalog instead [UseTomlInstead]
+    implementation("io.coil-kt:coil:2.6.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\build.gradle.kts:55: Warning: Use version catalog instead [UseTomlInstead]
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\build.gradle.kts:56: Warning: Use version catalog instead [UseTomlInstead]
+    implementation("androidx.fragment:fragment-ktx:1.7.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseTomlInstead":
+   If your project is using a libs.versions.toml file, you should place all
+   Gradle dependencies in the TOML file. This lint check looks for version
+   declarations outside of the TOML file and suggests moving them (and in the
+   IDE, provides a quickfix to performing the operation automatically).
+
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:21: Warning: Missing contentDescription attribute on image [ContentDescription]
+        <ImageView
+         ~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:56: Warning: Missing contentDescription attribute on image [ContentDescription]
+        <ImageView
+         ~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:105: Warning: Missing contentDescription attribute on image [ContentDescription]
+            <ImageView
+             ~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\item_feed_card.xml:19: Warning: Missing contentDescription attribute on image [ContentDescription]
+        <ImageView
+         ~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\item_feed_card.xml:70: Warning: Missing contentDescription attribute on image [ContentDescription]
+            <ImageView
+             ~~~~~~~~~
+
+   Explanation for issues of type "ContentDescription":
+   Non-textual widgets like ImageViews and ImageButtons should use the
+   contentDescription attribute to specify a textual description of the widget
+   such that screen readers and other accessibility tools can adequately
+   describe the user interface.
+
+   Note that elements in application screens that are purely decorative and do
+   not provide any content or enable a user action should not have
+   accessibility content descriptions. In this case, set their descriptions to
+   @null. If your app's minSdkVersion is 16 or higher, you can instead set
+   these graphical elements' android:importantForAccessibility attributes to
+   no.
+
+   Note that for text fields, you should not set both the hint and the
+   contentDescription attributes since the hint will never be shown. Just set
+   the hint.
+
+   https://developer.android.com/guide/topics/ui/accessibility/apps#special-cases
+
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:49: Warning: Hardcoded string "关注", should use @string resource [HardcodedText]
+            <com.google.android.material.tabs.TabItem android:text="关注" />
+                                                      ~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:50: Warning: Hardcoded string "精选", should use @string resource [HardcodedText]
+            <com.google.android.material.tabs.TabItem android:text="精选" />
+                                                      ~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:51: Warning: Hardcoded string "商城", should use @string resource [HardcodedText]
+            <com.google.android.material.tabs.TabItem android:text="商城" />
+                                                      ~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:52: Warning: Hardcoded string "推荐", should use @string resource [HardcodedText]
+            <com.google.android.material.tabs.TabItem android:text="推荐" />
+                                                      ~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:86: Warning: Hardcoded string "首页", should use @string resource [HardcodedText]
+            android:text="首页"
+            ~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:97: Warning: Hardcoded string "朋友", should use @string resource [HardcodedText]
+            android:text="朋友"
+            ~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:120: Warning: Hardcoded string "消息", should use @string resource [HardcodedText]
+            android:text="消息"
+            ~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\activity_main.xml:130: Warning: Hardcoded string "我", should use @string resource [HardcodedText]
+            android:text="我"
+            ~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\item_feed_card.xml:38: Warning: Hardcoded string "这里是视频标题，可能会比较长，换行显示", should use @string resource [HardcodedText]
+            android:text="这里是视频标题，可能会比较长，换行显示"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\item_feed_card.xml:65: Warning: Hardcoded string "用户名", should use @string resource [HardcodedText]
+                android:text="用户名"
+                ~~~~~~~~~~~~~~~~~~
+D:\douyin_try_native\app\src\main\res\layout\item_feed_card.xml:80: Warning: Hardcoded string "1.2w", should use @string resource [HardcodedText]
+                android:text="1.2w"
+                ~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "HardcodedText":
+   Hardcoding text attributes directly in layout files is bad for several
+   reasons:
+
+   * When creating configuration variations (for example for landscape or
+   portrait) you have to repeat the actual text (and keep it up to date when
+   making changes)
+
+   * The application cannot be translated to other languages by just adding
+   new translations for existing string resources.
+
+   There are quickfixes to automatically extract this hardcoded string into a
+   resource lookup.
+
+0 errors, 57 warnings

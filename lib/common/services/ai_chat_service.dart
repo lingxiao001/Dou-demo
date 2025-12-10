@@ -1,3 +1,4 @@
+//这是一个已经废弃的方法 ，暂时未删除 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 

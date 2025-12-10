@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.13.1" type="partial_results">
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.example.douyin_try_native.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+    <map id="UnusedResources">
+        <location id="R.color.black"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="3"
+            column="12"
+            startOffset="62"
+            endLine="3"
+            endColumn="24"
+            endOffset="74"/>
+        <location id="R.color.white"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="4"
+            column="12"
+            startOffset="104"
+            endLine="4"
+            endColumn="24"
+            endOffset="116"/>
+        <entry
+            name="model"
+            string="color[black(D),white(D)],drawable[ic_add_box(U),ic_friends(U),ic_home(U),ic_launcher_background(U),ic_launcher_foreground(U),ic_launcher_foreground_1(R),ic_me(U),ic_menu(U),ic_message(U),ic_search(U),img_cover_1(U),img_cover_2(U),img_cover_3(U),img_cover_4(U),img_cover_5(U),img_cover_6(U),img_cover_7(U),img_cover_8(U),img_cover_9(U)],id[main(U),top_bar(U),iv_menu(U),tab_layout(U),iv_search(U),bottom_bar(U),view_pager(U),recycler_view(U),iv_cover(U),tv_title(U),tv_author(U)],layout[activity_main(U),fragment_feed(U),item_feed_card(U)],mipmap[ic_launcher(U),ic_launcher_round(U)],string[app_name(U)],style[Theme_Douyin_try_native(U),Base_Theme_Douyin_try_native(U),Theme_Material3_DayNight_NoActionBar(R)],xml[data_extraction_rules(U),backup_rules(U)];6^7,20^9^19^17^b^4^3^2^a^8^1a^16,22^5^1d^1e^8,23^5^6,24^5^6,26^27,27^28;;;"/>
+    </map>
+
+</incidents>

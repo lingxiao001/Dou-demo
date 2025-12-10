@@ -1,0 +1,142 @@
+[
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/layout_item_feed_card.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/layout/item_feed_card.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/layout_fragment_feed.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/layout/fragment_feed.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_7.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_7.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_search.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_search.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_5.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_5.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_menu.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_menu.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_friends.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_friends.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/xml_backup_rules.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_1.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_1.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_add_box.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_add_box.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-anydpi_ic_launcher.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-anydpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_3.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_3.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_message.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_message.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_8.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_8.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_me.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_me.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_6.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_6.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/layout_activity_main.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_4.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_4.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/xml_data_extraction_rules.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_2.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_2.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_ic_home.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/ic_home.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-anydpi_ic_launcher_round.xml.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-anydpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/drawable_img_cover_9.png.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/drawable/img_cover_9.png"
+    },
+    {
+        "merged": "com.example.douyin_try_native.app-debug-44:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.douyin_try_native.app-main-46:/mipmap-mdpi/ic_launcher_round.webp"
+    }
+]

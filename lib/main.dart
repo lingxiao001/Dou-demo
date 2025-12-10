@@ -1,4 +1,5 @@
 import 'package:douyin_demo/features/feed/views/feed_screen.dart';
+import 'package:douyin_demo/features/viewer/views/viewer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,7 +33,15 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const FeedScreen(),
+      onGenerateRoute: (settings) {
+        final name = settings.name ?? '';
+        if (name.startsWith('viewer/')) {
+          final parts = name.split('/');
+          final idx = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+          return MaterialPageRoute(builder: (_) => ViewerScreen(initialIndex: idx));
+        }
+        return MaterialPageRoute(builder: (_) => const FeedScreen());
+      },
     );
   }
 }

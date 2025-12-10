@@ -17,7 +17,7 @@
   },
   {
     "id": "3",
-    "coverUrl": "https://img.youtube.com/vi/5-LyRjHlRgQ/0.jpg",
+    "coverUrl": "assets/covers/cover_3.jpg",
     "videoUrl": "assets/videos/video_3.mp4",
     "title": "美食教程：教你做一道入口即化的红烧肉",
     "likeCount": 8800,
@@ -49,7 +49,7 @@
   },
   {
     "id": "9",
-    "coverUrl": "https://picsum.photos/seed/vid9/400/600",
+    "coverUrl": "assets/covers/cover_9.jpg",
     "videoUrl": "assets/videos/___x_________MV.mp4",
     "title": "【蔡徐坤x憨豆先生】这真的不是原版MV吗？",
     "likeCount": 12800,
@@ -65,7 +65,7 @@
   },
   {
     "id": "10",
-    "coverUrl": "https://picsum.photos/seed/vid10/400/600",
+    "coverUrl": "assets/covers/cover_10.jpg",
     "videoUrl": "assets/videos/__________________.mp4",
     "title": "思绪飘回到从前，还记得芭芭拉第一次大招",
     "likeCount": 9400,
@@ -81,7 +81,7 @@
   },
   {
     "id": "11",
-    "coverUrl": "https://picsum.photos/seed/vid11/400/600",
+    "coverUrl": "assets/covers/cover_11.jpg",
     "videoUrl": "assets/videos/____vs____.mp4",
     "title": "生活给了我黑曜石，我是钻石稿",
     "likeCount": 11000,
@@ -97,7 +97,7 @@
   },
   {
     "id": "12",
-    "coverUrl": "https://picsum.photos/seed/vid12/400/600",
+    "coverUrl": "assets/covers/cover_12.jpg",
     "videoUrl": "assets/videos/What_a_Day___MV.mp4",
     "title": "蔡徐坤新歌 What a Day 官方MV",
     "likeCount": 18700,

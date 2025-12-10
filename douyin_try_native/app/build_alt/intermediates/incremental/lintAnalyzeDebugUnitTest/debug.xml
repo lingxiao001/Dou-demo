@@ -1,0 +1,26 @@
+<variant
+    name="debug"
+    package="com.example.douyin_try_native"
+    minSdkVersion="28"
+    targetSdkVersion="36.0"
+    debuggable="true"
+    mergedManifest="build_alt\intermediates\merged_manifest\debug\processDebugMainManifest\AndroidManifest.xml"
+    partialResultsDir="build_alt\intermediates\unit_test_lint_partial_results\debug\lintAnalyzeDebugUnitTest\out"
+    desugaredMethodsFiles="C:\Users\18319\.gradle\caches\8.13\transforms\b308e4fad164899c4b8795360b3ff254\transformed\D8BackportedDesugaredMethods.txt">
+  <buildFeatures
+      namespacing="REQUIRED"/>
+  <sourceProviders>
+  </sourceProviders>
+  <testSourceProviders>
+    <sourceProvider
+        manifests="src\test\AndroidManifest.xml"
+        javaDirectories="src\test\java;src\testDebug\java;src\test\kotlin;src\testDebug\kotlin"
+        assetsDirectories="src\test\assets;src\testDebug\assets"
+        unitTest="true"/>
+  </testSourceProviders>
+  <testFixturesSourceProviders>
+  </testFixturesSourceProviders>
+  <artifact
+      type="UNIT_TEST">
+  </artifact>
+</variant>

@@ -1,12 +1,6 @@
 package com.example.douyin_demo
 
 import android.content.Context
-import android.net.Uri
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.LruCache
-import java.util.concurrent.Executors
-import java.util.concurrent.ExecutorService
 import android.view.View
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -20,6 +14,8 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
+import coil.load
+import coil.size.ViewSizeResolver
 
 //表示抖音视频列表中的一项，包含视频 ID、标题、点赞数、封面路径和作者昵称。
 data class FeedItem(
@@ -145,48 +141,19 @@ class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
     private val title: TextView = v.findViewById(R.id.title)//视频标题
     private val author: TextView = v.findViewById(R.id.author)//作者昵称
     private val likes: TextView = v.findViewById(R.id.likes)//点赞数
-    companion object {
-        private val cache: LruCache<String, Bitmap> = object : LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 1024 / 8).toInt()) {
-            override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount / 1024
-        }
-        private val executor: ExecutorService = Executors.newFixedThreadPool(2)
-    }
     
     fun bind(item: FeedItem) {
         title.text = item.title
         author.text = item.authorNickname
         likes.text = formatLikes(item.likeCount)
-        cover.setImageDrawable(null)
-        val path = item.coverPath
-        if (path != null && path.isNotEmpty()) {
-            val p = if (path.startsWith("file://")) Uri.parse(path).path ?: path else path
-            val cached = cache.get(p)
-            if (cached != null) {
-                cover.setImageBitmap(cached)
-            } else {
-                executor.execute {
-                    try {
-                        val o1 = BitmapFactory.Options()
-                        o1.inJustDecodeBounds = true
-                        BitmapFactory.decodeFile(p, o1)
-                        var sample = 1
-                        val targetW = 512
-                        var w = o1.outWidth
-                        var h = o1.outHeight
-                        while (w / 2 >= targetW && h / 2 >= targetW * 4 / 3) {
-                            w /= 2; h /= 2; sample *= 2
-                        }
-                        val o2 = BitmapFactory.Options()
-                        o2.inSampleSize = sample
-                        o2.inPreferredConfig = Bitmap.Config.RGB_565
-                        val bmp = BitmapFactory.decodeFile(p, o2)
-                        if (bmp != null) {
-                            cache.put(p, bmp)
-                            cover.post { cover.setImageBitmap(bmp) }
-                        }
-                    } catch (_: Throwable) {}
-                }
+        val path = item.coverPath ?: ""
+        if (path.isNotEmpty()) {
+            cover.load(path) {
+                crossfade(true)
+                size(ViewSizeResolver(cover))
             }
+        } else {
+            cover.setImageDrawable(null)
         }
     }
     private fun formatLikes(count: Int): String {

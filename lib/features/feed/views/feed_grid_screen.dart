@@ -3,7 +3,6 @@ import 'package:douyin_demo/features/viewer/views/viewer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:douyin_demo/features/feed/viewmodels/feed_grid_view_model.dart';
-import 'package:douyin_demo/common/services/thumbnail_cache_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart' show Factory;
@@ -131,19 +130,19 @@ class _FeedGridScreenState extends ConsumerState<FeedGridScreen> {
   }
 
   Future<List<Map<String, dynamic>>> _buildNativePosts(List<dynamic> posts) async {
-    final service = ThumbnailCacheService();
     final futures = posts.map((p) async {
-      String? path;
-      try {
-        final f = await service.getThumbnail(p.videoUrl);
-        path = f.path;
-      } catch (_) {}
+      final vu = p.videoUrl as String;
+      final i = vu.lastIndexOf('/');
+      final base = i >= 0 ? vu.substring(i + 1) : vu;
+      final j = base.lastIndexOf('.');
+      final name = j >= 0 ? base.substring(0, j) : base;
+      final cover = 'file:///android_asset/flutter_assets/assets/covers/' + name + '.jpg';
       return {
         'id': p.id,
         'title': p.title,
         'likeCount': p.likeCount,
         'authorNickname': p.author.nickname,
-        'coverPath': path,
+        'coverPath': cover,
       };
     }).toList();
     return await Future.wait(futures);

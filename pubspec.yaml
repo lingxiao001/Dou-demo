@@ -70,6 +70,7 @@ flutter:
   assets:
     - assets/mock/
     - assets/videos/
+    - assets/covers/
     - assets/ark.key
 #    - assets/videos_ascii/
 
