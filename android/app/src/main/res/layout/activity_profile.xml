@@ -76,10 +76,10 @@
                 android:layout_marginTop="6dp">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="6" android:textStyle="bold" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" 获赞" />
-                <TextView android:layout_width="16dp" android:layout_height="wrap_content" />
+                <TextView android:layout_width="8dp" android:layout_height="wrap_content" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10" android:textStyle="bold" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" 关注" />
-                <TextView android:layout_width="16dp" android:layout_height="wrap_content" />
+                <TextView android:layout_width="8dp" android:layout_height="wrap_content" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" 粉丝" />
             </LinearLayout>
@@ -88,9 +88,17 @@
         <Button
             android:id="@+id/btn_edit"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:text="编辑主页"
-            android:minWidth="0dp" />
+            android:layout_height="wrap_content"
+            android:text="编辑资料"
+            android:textSize="13sp"
+            android:textColor="#161823"
+            android:background="@drawable/bg_gray_round"
+            app:backgroundTint="@null"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
     <TextView
