@@ -46,7 +46,7 @@ class FeedAdapter(private val onClick: (Int) -> Unit) : RecyclerView.Adapter<Fee
         notifyItemRangeInserted(start, list.size)
     }
 
-    
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedVH {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_feed_card, parent, false)
@@ -75,7 +75,7 @@ class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
         author.text = item.authorNickname
         likes.text = formatLikes(item.likeCount)
         val path = item.coverPath ?: ""
-        //todo coil源码 ，
+
         if (path.isNotEmpty()) {
             cover.load(path) {
                 crossfade(true) //淡入淡出

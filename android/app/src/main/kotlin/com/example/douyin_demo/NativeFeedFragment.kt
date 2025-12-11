@@ -31,10 +31,7 @@ class NativeFeedFragment : Fragment() {
     lm.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
     rv.layoutManager = lm
 
-    // 共享回收池：如果宿主 Activity 提供，则复用
-    (activity as? RecycledViewPoolProvider)?.sharedPool?.let { pool ->
-      rv.setRecycledViewPool(pool)
-    }
+    rv.setRecycledViewPool(RecyclerViewPoolManager.sharedPool)
 
 
 
