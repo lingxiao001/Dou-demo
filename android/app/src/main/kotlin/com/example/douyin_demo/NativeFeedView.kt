@@ -28,109 +28,25 @@ data class FeedItem(
 )
 
 
-/*
-//实现 PlatformViewFactory 接口，用于创建 NativeFeedView 实例。
-class NativeFeedFactory(private val messenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
-    override fun create(context: Context, id: Int, args: Any?): PlatformView {
-        return NativeFeedView(context, messenger, id, args)
-    }
-}
-//实现 PlatformView 接口，用于管理抖音视频列表的显示和交互。
-class NativeFeedView(
-    private val context: Context,
-    messenger: BinaryMessenger,
-    private val viewId: Int,
-    args: Any?
-) : PlatformView, MethodChannel.MethodCallHandler {//实现 MethodChannel.MethodCallHandler 接口，用于处理 Dart 端的方法调用。
-
-    private val recyclerView: RecyclerView = RecyclerView(context)
-    private val adapter = FeedAdapter { index ->
-        eventSink?.success(mapOf("type" to "onItemClick", "index" to index))
-    }
-    private val channel: MethodChannel = MethodChannel(messenger, "com.example.douyin_demo/native_feed_$viewId")
-    private val events: EventChannel = EventChannel(messenger, "com.example.douyin_demo/native_feed_events_$viewId")
-    private var eventSink: EventChannel.EventSink? = null
-//解析 Dart 端传递的参数，如视频列表、列数等。
-    init {
-        val columns = if (args is Map<*, *>) (args["columns"] as? Int) ?: 2 else 2
-        recyclerView.layoutManager = GridLayoutManager(context, columns)
-        recyclerView.setHasFixedSize(true)
-        recyclerView.itemAnimator = null
-        recyclerView.setItemViewCacheSize(16)
-        recyclerView.adapter = adapter
-        channel.setMethodCallHandler(this)
-        events.setStreamHandler(object : EventChannel.StreamHandler {
-            override fun onListen(o: Any?, sink: EventChannel.EventSink) { eventSink = sink }
-            override fun onCancel(o: Any?) { eventSink = null }
-        })
-        if (args is Map<*, *>) {
-            val posts = args["posts"] as? List<*>
-            if (posts != null) {
-                val items = posts.mapNotNull { p ->
-                    try {
-                        val m = p as Map<*, *>
-                        FeedItem(
-                            id = (m["id"] as? String) ?: "",
-                            title = (m["title"] as? String) ?: "",
-                            likeCount = (m["likeCount"] as? Int) ?: 0,
-                            coverPath = m["coverPath"] as? String,
-                            authorNickname = (m["authorNickname"] as? String) ?: ""
-                        )
-                    } catch (_: Throwable) { null }
-                }
-                adapter.setItems(items)
-            }
-        }
-    }
-//返回 RecyclerView 实例，用于 Flutter 端显示抖音视频列表。
-    override fun getView(): View = recyclerView
-
-    override fun dispose() {
-        channel.setMethodCallHandler(null)
-        eventSink = null
-    }
-
-    override fun onMethodCall(call: io.flutter.plugin.common.MethodCall, result: MethodChannel.Result) {
-        when (call.method) {
-            "setPosts" -> {
-                val posts = call.argument<List<Map<String, Any>>>("posts")
-                if (posts != null) {
-                    val items = posts.map {
-                        FeedItem(
-                            id = (it["id"] as? String) ?: "",
-                            title = (it["title"] as? String) ?: "",
-                            likeCount = (it["likeCount"] as? Int) ?: 0,
-                            coverPath = it["coverPath"] as? String,
-                            authorNickname = (it["authorNickname"] as? String) ?: ""
-                        )
-                    }
-                    adapter.setItems(items)
-                }
-                result.success(true)
-            }
-            "scrollToIndex" -> {
-                val index = call.argument<Int>("index") ?: 0
-                val smooth = call.argument<Boolean>("smooth") ?: true
-                if (smooth) recyclerView.smoothScrollToPosition(index) else recyclerView.scrollToPosition(index)
-                result.success(true)
-            }
-            else -> result.notImplemented()
-        }
-    }
-}
-*/
-
-
-
 
 // RecyclerView.Adapter 接口
 class FeedAdapter(private val onClick: (Int) -> Unit) : RecyclerView.Adapter<FeedVH>() {
-    private var items: List<FeedItem> = emptyList()
+    private var items: MutableList<FeedItem> = mutableListOf()//items为可操作列表 
+
+
     fun setItems(list: List<FeedItem>) {
-        items = list //存入
+        items = list.toMutableList() //存入
         notifyDataSetChanged() //刷新
     }
 
+    fun addItems(list: List<FeedItem>) {
+        val start = items.size
+        items.addAll(list) //直接在现有数据的末尾追加新的一页数据
+        //性能优化 - 局部刷新新插入的 
+        notifyItemRangeInserted(start, list.size)
+    }
+
+    
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedVH {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_feed_card, parent, false)
@@ -159,6 +75,7 @@ class FeedVH(v: View) : RecyclerView.ViewHolder(v) {
         author.text = item.authorNickname
         likes.text = formatLikes(item.likeCount)
         val path = item.coverPath ?: ""
+        //todo coil源码 ，
         if (path.isNotEmpty()) {
             cover.load(path) {
                 crossfade(true) //淡入淡出

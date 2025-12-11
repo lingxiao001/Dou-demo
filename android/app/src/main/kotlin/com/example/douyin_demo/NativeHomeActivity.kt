@@ -9,13 +9,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+//程序入口 纯原生 ，只有点击视频预览图时--启动 MainActivity（FlutterActivity）
+
 
 interface RecycledViewPoolProvider {
   val sharedPool: RecyclerView.RecycledViewPool
 }
 
 class NativeHomeActivity : AppCompatActivity(), RecycledViewPoolProvider {
-
+    //todo 抽出来 ~~~~~~~~
   override val sharedPool = RecyclerView.RecycledViewPool().apply {
     // 默认 viewType = 0，为了快速滑动，将缓存池大小增加到 18
     setMaxRecycledViews(0, 18)

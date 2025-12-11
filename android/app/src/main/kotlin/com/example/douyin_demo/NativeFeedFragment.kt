@@ -14,6 +14,7 @@ import java.io.File
 
 class NativeFeedFragment : Fragment() {
   private var items: List<FeedItem> = emptyList()
+  private var isLoading = false//锁-是否正在加载更多
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.fragment_feed, container, false)
@@ -30,16 +31,49 @@ class NativeFeedFragment : Fragment() {
     lm.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
     rv.layoutManager = lm
 
-    // 优雅地共享回收池：如果宿主 Activity 提供，则复用
+    // 共享回收池：如果宿主 Activity 提供，则复用
     (activity as? RecycledViewPoolProvider)?.sharedPool?.let { pool ->
       rv.setRecycledViewPool(pool)
     }
 
-    items = loadFeedItems()
 
-    val adapter = FeedAdapter { index -> openFlutterViewer(index) }
+
+    items = loadFeedItems()//拿到我所有mock数据
+
+
+
+    val adapter = FeedAdapter { index -> 
+        if (items.isNotEmpty()) {
+            openFlutterViewer(index % items.size) //这里是重复用mock数据模拟，不断循环重复，index取模开视频
+        }
+    }
     adapter.setItems(items)
     rv.adapter = adapter
+
+
+
+    // 无限滚动加载
+    rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            if (dy > 0 && !isLoading) {
+                val totalItemCount = lm.itemCount
+                //拿到交错网格最底部位置 
+                val lastVisibleItemPositions = lm.findLastVisibleItemPositions(null)
+                val lastVisibleItemPosition = lastVisibleItemPositions.maxOrNull() ?: 0//找到最底 
+                
+                // 还剩4个到底就加载more 
+                if (totalItemCount <= lastVisibleItemPosition + 4) {
+                    isLoading = true
+                    rv.post {
+                        adapter.addItems(items)//重复无限加载-把手里的数据又塞回去 
+                        isLoading = false
+                    }
+                }
+            }
+        }
+    })
   }
 
 

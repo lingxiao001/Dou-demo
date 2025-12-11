@@ -15,13 +15,14 @@ import coil.load
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
+//todo 粉丝字 按钮 ；折行问题1
 class ProfileActivity : AppCompatActivity() {
   private lateinit var sp: SharedPreferences
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_profile)
-
+        //todo 查一下生命周期 --
     sp = getSharedPreferences("FlutterSharedPreferences", MODE_PRIVATE)
     val nicknameV = findViewById<TextView>(R.id.nickname)
     val avatarV = findViewById<ImageView>(R.id.avatar)
