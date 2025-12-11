@@ -14,8 +14,13 @@ import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import org.json.JSONArray
+import java.io.File
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import coil.size.ViewSizeResolver
 
-//todo 粉丝字 按钮 ；折行问题1
 class ProfileActivity : AppCompatActivity() {
   private lateinit var sp: SharedPreferences
 
@@ -74,28 +79,126 @@ class ProfileActivity : AppCompatActivity() {
   }
 }
 
+
+
+
+
+
 //模拟九宫格网格列表
 class GridPlaceholderFragment : androidx.fragment.app.Fragment() {
   override fun onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup?, savedInstanceState: Bundle?): android.view.View? {
     val rv = RecyclerView(requireContext())
     rv.layoutManager = GridLayoutManager(requireContext(), 3)
-    rv.adapter = object : RecyclerView.Adapter<VH>() {
-      override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): VH {
-        val v = android.view.View(parent.context)
-        val size = parent.resources.displayMetrics.widthPixels / 3 - 12
-        v.layoutParams = RecyclerView.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, size)
-        v.setBackgroundColor(0xFFECECEC.toInt())
-        return VH(v)
-      }
-      override fun getItemCount(): Int = 12
-      override fun onBindViewHolder(holder: VH, position: Int) {}
+    
+    val items = loadFeedItems()
+    val adapter = ProfileGridAdapter { index -> 
+        if (items.isNotEmpty()) {
+            openFlutterViewer(index % items.size)
+        }
     }
-    val pad = (12 * resources.displayMetrics.density).toInt()
-    rv.setPadding(pad, pad, pad, pad)
+    adapter.setItems(items)
+    rv.adapter = adapter
+    
+    // 移除 padding，因为我们希望图片铺满，间隔由 item layout 的 margin 控制
+    rv.setPadding(0, 0, 0, 0)
     rv.clipToPadding = false
     return rv
   }
+
+  private fun openFlutterViewer(index: Int) {
+    val intent = io.flutter.embedding.android.FlutterActivity
+      .NewEngineIntentBuilder(MainActivity::class.java)
+      .initialRoute("viewer/$index")
+      .build(requireContext())
+    startActivity(intent)
+  }
+
+  private fun loadFeedItems(): List<FeedItem> {
+    val bridgeFile = File(requireContext().filesDir, "native_bridge/feed_posts.json")
+    if (bridgeFile.exists()) {
+      val txt = bridgeFile.readText()
+      return parseBridgeJson(txt)
+    }
+    val am = requireContext().assets
+    val input = am.open("flutter_assets/assets/mock/videos.json")
+    val json = input.bufferedReader().use { it.readText() }
+    return parseAssetsJson(json)
+  }
+
+  private fun parseBridgeJson(json: String): List<FeedItem> {
+    val arr = JSONArray(json)
+    val out = mutableListOf<FeedItem>()
+    for (i in 0 until arr.length()) {
+      val o = arr.getJSONObject(i)
+      out.add(
+        FeedItem(
+          id = o.optString("id"),
+          title = o.optString("title"),
+          likeCount = o.optInt("likeCount"),
+          coverPath = o.optString("coverPath"),
+          authorNickname = o.optString("authorNickname")
+        )
+      )
+    }
+    return out
+  }
+
+  private fun parseAssetsJson(json: String): List<FeedItem> {
+    val arr = JSONArray(json)
+    val out = mutableListOf<FeedItem>()
+    for (i in 0 until arr.length()) {
+      val o = arr.getJSONObject(i)
+      val author = o.getJSONObject("author")
+      val id = o.optString("id")
+      val title = o.optString("title")
+      val likeCount = o.optInt("likeCount")
+      val videoUrl = o.optString("videoUrl")
+      val authorNickname = author.optString("nickname")
+      val name = File(videoUrl).nameWithoutExtension + ".jpg"
+      val coverPath = "file:///android_asset/flutter_assets/assets/covers/$name"
+      out.add(FeedItem(id = id, title = title, likeCount = likeCount, coverPath = coverPath, authorNickname = authorNickname))
+    }
+    return out
+  }
 }
 
-class VH(v: android.view.View) : RecyclerView.ViewHolder(v)
+class ProfileGridAdapter(private val onClick: (Int) -> Unit) : RecyclerView.Adapter<ProfileGridVH>() {
+    private var items: List<FeedItem> = emptyList()
+    fun setItems(list: List<FeedItem>) {
+        items = list
+        notifyDataSetChanged()
+    }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileGridVH {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_profile_grid, parent, false)
+        return ProfileGridVH(v)
+    }
+
+    override fun getItemCount(): Int = items.size
+
+    override fun onBindViewHolder(holder: ProfileGridVH, position: Int) {
+        holder.bind(items[position])
+        holder.itemView.setOnClickListener { onClick(position) }
+    }
+}
+
+class ProfileGridVH(v: View) : RecyclerView.ViewHolder(v) {
+    private val cover: ImageView = v.findViewById(R.id.cover)
+    private val likes: TextView = v.findViewById(R.id.likes)
+    
+    fun bind(item: FeedItem) {
+        likes.text = formatLikes(item.likeCount)
+        val path = item.coverPath ?: ""
+        if (path.isNotEmpty()) {
+            cover.load(path) {
+                crossfade(true)
+                size(ViewSizeResolver(cover))
+            }
+        } else {
+            cover.setImageDrawable(null)
+        }
+    }
+    private fun formatLikes(count: Int): String {
+        return if (count >= 10000) String.format("%.1f万", count / 10000.0) else count.toString()
+    }
+}
