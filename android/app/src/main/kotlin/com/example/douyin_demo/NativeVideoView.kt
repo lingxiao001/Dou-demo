@@ -21,6 +21,7 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
+import com.example.douyin_demo.PlayerPool
 
 //实现 PlatformViewFactory 接口，当 Flutter需要显示该部分 ，就会调用工厂单独create方法
 class NativeVideoFactory(private val messenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
@@ -50,16 +51,7 @@ class NativeVideoView(
     init {
         playerView.useController = false//关掉ExoPlayer默认丑陋UI
 
-        val trackSelector = DefaultTrackSelector(context)
-        //2000ms-2.0s的起播门槛偏保守
-        val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(10000, 20000, 2000, 3000)
-            .build()
-
-        player = ExoPlayer.Builder(context)
-            .setTrackSelector(trackSelector)
-            .setLoadControl(loadControl)
-            .build()
+        player = PlayerPool.acquire(context)
 
         player.repeatMode = Player.REPEAT_MODE_ALL//重复播放
         player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT//完整显示,保持比例
@@ -103,7 +95,7 @@ class NativeVideoView(
     override fun dispose() {
         channel.setMethodCallHandler(null)
         playerView.player = null
-        player.release()//释放该View时也释放底层解码器
+        PlayerPool.release(player)
     }
 
 
@@ -134,7 +126,8 @@ class NativeVideoView(
             "setUrl" -> {
                 val url = call.argument<String>("url")
                 if (url != null) {
-                    val item = MediaItem.fromUri(Uri.parse(url))
+                    val uri = if (url.startsWith("assets/")) Uri.parse("asset:///" + url) else Uri.parse(url)
+                    val item = MediaItem.fromUri(uri)
                     player.setMediaItem(item)
                     player.prepare()
                 }
