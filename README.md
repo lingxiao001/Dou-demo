@@ -2,11 +2,6 @@
 
 # 项目文档 (Dou-demo)
 
-**仓库链接**：[https://github.com/lingxiao001/Dou-demo/tree/native-first](https://github.com/lingxiao001/Dou-demo/tree/native-first)  
-**Branch**：`native-first`
-
----
-
 ## 一. 项目概览
 
 ### 1.1 项目简介
