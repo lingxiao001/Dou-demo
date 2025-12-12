@@ -77,11 +77,4 @@ class _NativeVideoViewState extends State<NativeVideoView> {
   }
 }
 
-//在 Dart 端定义一个 MethodChannel，用于与 Android 端通信。
-const _bridge = MethodChannel('com.example.douyin_demo/native');
-//调用 Android 端的 openNativePlayer 方法，传递视频 URL。
-Future<void> openNativePlayer(String url) async {
-  if (!kIsWeb && Platform.isAndroid) {
-    await _bridge.invokeMethod('openNativePlayer', {'url': url});
-  }
-}
+
